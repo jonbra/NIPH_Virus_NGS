@@ -43,31 +43,5 @@ process MAP {
 
     cp .command.sh ${sampleName}.bowtie2.sh
 
-    # Get the reference with most mapped reads
-    # Need to have the bai file in the same location
-    # This gives the name of the most mapped reference.
-    samtools idxstats Virus220220.sorted.bam | cut -f 1,3 | sort -nr -k 2 | head -1 | cut -f1
-
-    # Then redo the mapping with only that.
-    # One way is to pull it out of the genome reference file.
-    # Another is to add all the individual genotypes into a genomes.config file like in nf-core.
-    # In addition to the combined references. 
     """
 }
-/*
-process MAP {
-   publishDir "${params.outdir}/mapping", mode:'copy'
-
-   input:
-   path index
-   tuple val(pair_id), path(trimmed_R)
-
-   output:
-   path "${pair_id}.sam"
-
-   script:
-   """
-   bowtie2 --threads 8 -x index -S ${pair_id}.sam -1 ${name}_R1.fastq -2 ${name}_R2.fastq
-   """
-}
-*/
