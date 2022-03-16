@@ -2,12 +2,12 @@ nextflow.enable.dsl=2
 
 pipeline_version = "v1"
 params.pipeline_version = pipeline_version // For use in modules
-
+params.cpu=4
 nf_mod_path = "$baseDir/modules"
 
 // **********************************************************************************
 
-ref_file = "$baseDir/data/references/HCVgenosubtypes_8.5.19_clean.fa"
+ref_file = "$baseDir/Data/References/HCVgenosubtypes_8.5.19_clean.fa"
 //primer_bed = "$baseDir/util/swift_primers.bed"
 //primer_master_file = "$baseDir/util/sarscov2_v2_masterfile.txt"
 //nscTrim_primer_file = "$baseDir/util/swift_amplicon_nscTrim_750b.txt"
@@ -56,6 +56,7 @@ include { FASTQC as FASTQC_TRIM } from "$nf_mod_path/fastqc.nf"
 include { INDEX } from "$nf_mod_path/index.nf"
 include { MAP } from "$nf_mod_path/map.nf"
 include { CONSENSUS} from "$nf_mod_path/consensus.nf"
+include { MODIFY_FASTA } from "$nf_mod_path/modify_fasta.nf"
 /*include { NSCTRIM } from "$nf_mod_path/nsctrim.nf"
 include { FASTP } from "$nf_mod_path/fastp.nf"
 include { FASTQC as FASTQC_CLEAN } from "$nf_mod_path/fastqc.nf"
@@ -102,7 +103,8 @@ workflow {
     MAP(TRIM.out.CUT_out, ref_file, INDEX.out.INDEX_out)
     // Mapping mot entire database, mapping mot major og minor
     //CONSENSUS(MAP.out.MAP_out, ref_file)
-    CONSENSUS(MAP.out.MAP_out, ref_file)
+    CONSENSUS(TRIM.out.CUT_out, MAP.out.MAP_out, ref_file)
+    MODIFY_FASTA(reads, CONSENSUS.out.CONSENSUS_fa)
 }
     //NSCTRIM(reads, nscTrim_primer_file)
     //FASTP(NSCTRIM.out.NSCTRIM_out)
