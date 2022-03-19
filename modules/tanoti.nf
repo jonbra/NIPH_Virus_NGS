@@ -18,6 +18,9 @@ process TANOTI {
 
     script:
     """
+    # Add mapper to path
+    export PATH="~/Prosjekter/Tanoti/src:$PATH"
+
     #align vs. entire db
     tanoti \
         -r $genome \
