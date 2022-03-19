@@ -3,4 +3,5 @@ work/*
 results/*
 HCV-nf/*
 Data/Raw_files/*
-Run712/*
+Run712*/*
+Test*/

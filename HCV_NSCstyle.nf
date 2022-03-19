@@ -1,6 +1,6 @@
 nextflow.enable.dsl=2
 
-pipeline_version = "v1"
+pipeline_version = "dev"
 params.pipeline_version = pipeline_version // For use in modules
 params.cpu=4
 nf_mod_path = "$baseDir/modules"
@@ -23,12 +23,6 @@ params.outdir = params.outpath + "/results/"
 
 // **********************************************************************************
 
-if (params.outpath.matches('(.*)HCV(.*)')) {
-    params.lab = 'HCV'
-}
-if (params.outpath.matches('(.*)HAV(.*)')) {
-    params.lab = 'HAV'
-}
 
 File pipeline_tool_file = new File("$params.outpath/pipeline_info.txt")
 pipeline_tool_file.write '\n' +
@@ -36,8 +30,7 @@ pipeline_tool_file.write '\n' +
                          '\n' +
                          'RunFolder:\t' + params.outpath + '\n' +
                          'SampleSheet:\t' + params.samplelist + '\n' +
-                         'Lab:\t\t' + params.lab + '\n' +
-                         'Align:\t\t' + params.align_tool + '\n' +
+                         'Mapper:\t\t' + params.align_tool + '\n' +
                          '\n'
 
 
@@ -54,14 +47,16 @@ include { FASTQC } from "$nf_mod_path/fastqc.nf"
 include { TRIM } from "$nf_mod_path/trim.nf"
 include { FASTQC as FASTQC_TRIM } from "$nf_mod_path/fastqc.nf"
 include { INDEX } from "$nf_mod_path/index.nf"
-include { MAP } from "$nf_mod_path/map.nf"
+include { BOWTIE } from "$nf_mod_path/bowtie2.nf"
+include { TANOTI } from "$nf_mod_path/tanoti.nf"
 include { CONSENSUS} from "$nf_mod_path/consensus.nf"
 include { MODIFY_FASTA } from "$nf_mod_path/modify_fasta.nf"
+include { MULTIQC } from "$nf_mod_path/multiqc.nf"
 /*include { NSCTRIM } from "$nf_mod_path/nsctrim.nf"
 include { FASTP } from "$nf_mod_path/fastp.nf"
 include { FASTQC as FASTQC_CLEAN } from "$nf_mod_path/fastqc.nf"
 
-include { MULTIQC } from "$nf_mod_path/multiqc.nf"
+
 
 include { BOWTIE2_INDEX; BOWTIE2_ALIGN } from "$nf_mod_path/bowtie2.nf"
 include { BWA_INDEX; BWA_ALIGN } from "$nf_mod_path/bwa.nf"
@@ -100,11 +95,25 @@ workflow {
     TRIM(reads)
     FASTQC_TRIM(TRIM.out.CUT_out, 'trimmed')
     INDEX(ref_file)
-    MAP(TRIM.out.CUT_out, ref_file, INDEX.out.INDEX_out)
+
+    if ( params.align_tool == "bowtie2") {
+        BOWTIE(TRIM.out.CUT_out, ref_file, INDEX.out.INDEX_out)
+        ALIGNED = BOWTIE.out.BOWTIE2_out
+    } else if ( params.align_tool == "tanoti") {
+        TANOTI(TRIM.out.CUT_out, ref_file)
+        ALIGNED = TANOTI.out.TANOTI_out
+    }
+
     // Mapping mot entire database, mapping mot major og minor
     //CONSENSUS(MAP.out.MAP_out, ref_file)
-    CONSENSUS(TRIM.out.CUT_out, MAP.out.MAP_out, ref_file)
+    CONSENSUS(TRIM.out.CUT_out, ALIGNED, ref_file)
     MODIFY_FASTA(reads, CONSENSUS.out.CONSENSUS_fa)
+
+    // MultiQC -- Needs input from all FastQC and fastp reports
+    FILES_FOR_MULTIQC = FASTQC.out.FASTQC_out.collect { it[1] }.mix(
+            FASTQC_TRIM.out.FASTQC_out.collect { it[1] }
+    ).collect()
+    MULTIQC(FILES_FOR_MULTIQC)
 }
     //NSCTRIM(reads, nscTrim_primer_file)
     //FASTP(NSCTRIM.out.NSCTRIM_out)
@@ -146,13 +155,7 @@ workflow {
         Channel.fromPath(params.samplelist)
     )
 
-    // MultiQC -- Needs input from all FastQC and fastp reports
-    FILES_FOR_MULTIQC = FASTQC_CLEAN.out.FASTQC_out.collect { it[1] }.mix(
-        FASTP.out.FASTP_out_forMULTIQC.collect { it[1] }.mix(
-            FASTQC.out.FASTQC_out.collect { it[1] }
-        )
-    ).collect()
-    MULTIQC(FILES_FOR_MULTIQC)
+
 
     // Report generator and QC
     GENERATE_REPORT(
