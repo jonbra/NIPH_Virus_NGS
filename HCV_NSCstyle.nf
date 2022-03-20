@@ -76,7 +76,9 @@ workflow {
 
     // MultiQC -- Needs input from all FastQC and fastp reports
     FILES_FOR_MULTIQC = FASTQC.out.FASTQC_out.collect { it[1] }.mix(
-            FASTQC_TRIM.out.FASTQC_out.collect { it[1] }
+            FASTQC_TRIM.out.FASTQC_out.collect { it[1] }.mix(
+              BOWTIE.out.BOWTIE2_log.collect { it[1] }
+              )
     ).collect()
     MULTIQC(FILES_FOR_MULTIQC)
 }
