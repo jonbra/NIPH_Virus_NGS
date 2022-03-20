@@ -52,7 +52,6 @@ process BOWTIE {
         --very-sensitive-local \
         -x "\${major}" \
         -1 ${read1} -2 ${read2} \
-        -S ${sampleName}.major.bam \
         2> ${sampleName}.bowtie2_major.log \
         | samtools sort -@ $task.cpus -T ${sampleName} -O bam - > ${sampleName}.major.sorted.bam
 
