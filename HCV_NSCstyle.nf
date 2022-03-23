@@ -33,12 +33,15 @@ log.info """\
 
 include { FASTQC } from "$nf_mod_path/fastqc.nf"
 include { TRIM } from "$nf_mod_path/trim.nf"
+include { DEDUP } from "$nf_mod_path/dedup.nf"
 include { FASTQC as FASTQC_TRIM } from "$nf_mod_path/fastqc.nf"
 include { INDEX } from "$nf_mod_path/index.nf"
 include { BOWTIE } from "$nf_mod_path/bowtie2.nf"
 include { TANOTI } from "$nf_mod_path/tanoti.nf"
-include { CONSENSUS} from "$nf_mod_path/consensus.nf"
-include { MODIFY_FASTA } from "$nf_mod_path/modify_fasta.nf"
+include { CLIQUE_SNV } from "$nf_mod_path/cliquesnv.nf"
+include { CLUSTER } from "$nf_mod_path/clustering.nf"
+//include { CONSENSUS} from "$nf_mod_path/consensus.nf"
+//include { MODIFY_FASTA } from "$nf_mod_path/modify_fasta.nf"
 include { MULTIQC } from "$nf_mod_path/multiqc.nf"
 
 workflow {
@@ -58,27 +61,36 @@ workflow {
     FASTQC(reads, 'raw')
     //REPORT(reads, 'raw')
     TRIM(reads)
-    FASTQC_TRIM(TRIM.out.CUT_out, 'trimmed')
-    INDEX(ref_file)
+    DEDUP(TRIM.out.TRIM_out)
+    FASTQC_TRIM(DEDUP.out.DEDUP_out, 'trimmed')
 
-    if ( params.align_tool == "bowtie2") {
-        BOWTIE(TRIM.out.CUT_out, ref_file, INDEX.out.INDEX_out)
+    if ( params.align_tool == "bowtie2" ) {
+        INDEX(ref_file)
+        BOWTIE(DEDUP.out.DEDUP_out, ref_file, INDEX.out.INDEX_out)
         ALIGNED = BOWTIE.out.BOWTIE2_out
-    } else if ( params.align_tool == "tanoti") {
-        TANOTI(TRIM.out.CUT_out, ref_file)
+    } else if ( params.align_tool == "tanoti" ) {
+        TANOTI(TRIM.out.TRIM_out, ref_file)
         ALIGNED = TANOTI.out.TANOTI_out
     }
 
-    // Mapping mot entire database, mapping mot major og minor
-    //CONSENSUS(MAP.out.MAP_out, ref_file)
-    CONSENSUS(TRIM.out.CUT_out, ALIGNED, ref_file)
-    MODIFY_FASTA(reads, CONSENSUS.out.CONSENSUS_fa)
+    CLIQUE_SNV(BOWTIE.out.BOWTIE2_out)
+    FILES_FOR_CLUSTER = CLIQUE_SNV.out.CLIQUE_out.collect()
+    CLUSTER(FILES_FOR_CLUSTER)
+    //CONSENSUS(TRIM.out.TRIM_out, ALIGNED, ref_file)
+    //MODIFY_FASTA(reads, CONSENSUS.out.CONSENSUS_fa)
 
     // MultiQC -- Needs input from all FastQC and fastp reports
-    FILES_FOR_MULTIQC = FASTQC.out.FASTQC_out.collect { it[1] }.mix(
-            FASTQC_TRIM.out.FASTQC_out.collect { it[1] }.mix(
-              BOWTIE.out.BOWTIE2_log.collect { it[1] }
-              )
-    ).collect()
+    if ( params.align_tool == "bowtie2" ) {
+      FILES_FOR_MULTIQC = FASTQC.out.FASTQC_out.collect { it[1] }.mix(
+              FASTQC_TRIM.out.FASTQC_out.collect { it[1] }.mix(
+                BOWTIE.out.BOWTIE2_log.collect { it[1] }
+                )
+      ).collect()
+    } else if ( params.align_tool == "tanoti" ) {
+      FILES_FOR_MULTIQC = FASTQC.out.FASTQC_out.collect { it[1] }.mix(
+              FASTQC_TRIM.out.FASTQC_out.collect { it[1] }
+      ).collect()
+    }
+
     MULTIQC(FILES_FOR_MULTIQC)
 }
