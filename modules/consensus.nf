@@ -11,14 +11,12 @@ process CONSENSUS {
   path genome
 
   output:
-  tuple val(sampleName), path ("${sampleName}.major.sorted.fix.sorted.marked.bam")
   path "*.major_consensus.fa", emit: CONSENSUS_fa
   path "*.{gz,csi,bed}"
 
 
   """
   # Make the major genotype again
-  # NB: Tror ikke denne virker om det er få reads mapped?
   mapped_reads="\$(samtools idxstats ${sampleName}.major.sorted.bam | cut -f 1,3 | sort -k2 -h | tail -1 | cut -f2)"
   if [ "\${mapped_reads}" -gt 499 ]
   then
