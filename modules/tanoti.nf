@@ -12,13 +12,12 @@ process TANOTI {
     publishDir "${params.outdir}/2_bam/log", mode: 'link', pattern:'*.{stats,sh}'
 
     output:
-    tuple val(sampleName), path ("${sampleName}.major.sorted.fix.sorted.marked.bam"), path ("${sampleName}.major.sorted.fix.sorted.marked.bam.bai"), emit: TANOTI_out
-    path "${sampleName}_QC_*"
-    path "*.{stats,sh}"
+    tuple val(sampleName), path ("${sampleName}.major.sorted.bam"), path ("${sampleName}.major.sorted.bam.bai"), emit: TANOTI_out
+    path "*.{stats,sh,txt}"
 
     script:
     """
-    #align vs. entire db
+    # First map against all references
     tanoti \
         -r $genome \
         -i ${read1} ${read2} \
@@ -31,37 +30,28 @@ process TANOTI {
 
     samtools stats ${sampleName}.sorted.bam > ${sampleName}.sorted.bam.stats
 
-    SEQ=\$(grep 'raw total sequences' ${sampleName}.sorted.bam.stats | cut -f3)
-    if [[ \$SEQ -gt 999 ]]
-    then
-        echo 'PASS' > ${sampleName}_QC_MAPPING_PASS
-        # Re-map against the reference with the most mapped reads
-        major="\$(samtools idxstats ${sampleName}.sorted.bam | cut -f 1,3 | sort -k2 -h | tail -1 | cut -f1)" # Reference with most reads
-        samtools faidx ${genome} "\${major}" > "\${major}".fa # Get the fasta sequence
-        tanoti \
-            -r "\${major}".fa \
-            -i ${read1} ${read2} \
-            -o ${sampleName}.major.sam \
-            -p 1 -u 0 -m 95
-        samtools view -bS ${sampleName}.major.sam | samtools sort -o ${sampleName}.major.sorted.bam
+    SEQ=\$(grep 'reads mapped:' ${sampleName}.sorted.bam.stats | cut -f3)
+    echo \${SEQ} > ${sampleName}_MAPPING_info.txt
 
-        samtools index ${sampleName}.major.sorted.bam
+    # Then re-map against the reference with the most mapped reads
+    major="\$(samtools idxstats ${sampleName}.sorted.bam | cut -f 1,3 | sort -k2 -h | tail -1 | cut -f1)" # Reference with most reads
+    echo "\${major}" >> ${sampleName}_MAPPING_info.txt
+    samtools faidx ${genome} "\${major}" > "\${major}".fa # Get the fasta sequence
 
-        samtools stats ${sampleName}.major.sorted.bam > ${sampleName}.major.sorted.bam.stats
+    tanoti \
+      -r "\${major}".fa \
+      -i ${read1} ${read2} \
+      -o ${sampleName}.major.sam \
+      -p 1 -u 0 -m 95
 
-        # Order and fix the bam file
-        samtools sort -n ${sampleName}.major.sorted.bam > ${sampleName}.major.sorted.byQuery.bam
-        samtools fixmate -m ${sampleName}.major.sorted.byQuery.bam ${sampleName}.major.sorted.fix.bam
-        samtools sort ${sampleName}.major.sorted.fix.bam > ${sampleName}.major.sorted.fix.sorted.bam
+    samtools view -bS ${sampleName}.major.sam | samtools sort -o ${sampleName}.major.sorted.bam
 
-        # Remove duplicates
-        samtools markdup -r ${sampleName}.major.sorted.fix.sorted.bam ${sampleName}.major.sorted.fix.sorted.marked.bam
-        samtools index ${sampleName}.major.sorted.fix.sorted.marked.bam
+    samtools index ${sampleName}.major.sorted.bam
 
-        samtools stats ${sampleName}.major.sorted.fix.sorted.marked.bam > ${sampleName}.major.sorted.fix.sorted.marked.bam.stats  
-    else
-        echo 'FAIL' > ${sampleName}_QC_MAPPING_FAIL
-    fi
+    samtools stats ${sampleName}.major.sorted.bam > ${sampleName}.major.sorted.bam.stats
+
+    SEQ2=\$(grep 'reads mapped:' ${sampleName}.major.sorted.bam.stats | cut -f3)
+    echo \${SEQ2} >> ${sampleName}_MAPPING_info.txt
 
     cp .command.sh ${sampleName}.tanoti.sh
     """
