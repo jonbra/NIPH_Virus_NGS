@@ -6,12 +6,13 @@ process DEDUP {
   tuple val(sampleName), path(read1), path(read2)
 
   output:
-  tuple val(sampleName), path ("${sampleName}_trimmed_R1_dedup.fastq"), path ("${sampleName}_trimmed_R2_dedup.fastq"), emit: DEDUP_out
+  tuple val(sampleName), path ("${sampleName}_trimmed_dedup_R1.fastq"), path ("${sampleName}_trimmed_dedup_R2.fastq"), emit: DEDUP_out
 
   script:
   """
   # Change the fasta header to include the sampleName
-  dedupe.sh in=${read1} out=${sampleName}_trimmed_R1_dedup.fastq
-  dedupe.sh in=${read2} out=${sampleName}_trimmed_R2_dedup.fastq
+  # Teh ac=f flag disables containment removal. I.e. only excat identicals will be removed.
+  dedupe.sh threads=auto ac=f in1=${read1} in2=${read2} out=${sampleName}_trimmed_dedup.fastq
+  reformat.sh in=${sampleName}_trimmed_dedup.fastq out1=${sampleName}_trimmed_dedup_R1.fastq out2=${sampleName}_trimmed_dedup_R2.fastq
   """
 }
