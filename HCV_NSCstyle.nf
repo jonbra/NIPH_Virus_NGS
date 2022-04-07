@@ -38,8 +38,8 @@ include { FASTQC as FASTQC_TRIM } from "$nf_mod_path/fastqc.nf"
 include { INDEX } from "$nf_mod_path/index.nf"
 include { BOWTIE } from "$nf_mod_path/bowtie2.nf"
 include { TANOTI } from "$nf_mod_path/tanoti.nf"
-include { CLIQUE_SNV } from "$nf_mod_path/cliquesnv.nf"
-include { CLUSTER } from "$nf_mod_path/clustering.nf"
+//include { CLIQUE_SNV } from "$nf_mod_path/cliquesnv.nf"
+//include { CLUSTER } from "$nf_mod_path/clustering.nf"
 //include { CONSENSUS} from "$nf_mod_path/consensus.nf"
 //include { MODIFY_FASTA } from "$nf_mod_path/modify_fasta.nf"
 include { MULTIQC } from "$nf_mod_path/multiqc.nf"
@@ -69,13 +69,13 @@ workflow {
         BOWTIE(DEDUP.out.DEDUP_out, ref_file, INDEX.out.INDEX_out)
         ALIGNED = BOWTIE.out.BOWTIE2_out
     } else if ( params.align_tool == "tanoti" ) {
-        TANOTI(TRIM.out.TRIM_out, ref_file)
+        TANOTI(DEDUP.out.DEDUP_out, ref_file)
         ALIGNED = TANOTI.out.TANOTI_out
     }
 
-    CLIQUE_SNV(BOWTIE.out.BOWTIE2_out)
-    FILES_FOR_CLUSTER = CLIQUE_SNV.out.CLIQUE_out.collect()
-    CLUSTER(FILES_FOR_CLUSTER)
+    //CLIQUE_SNV(BOWTIE.out.BOWTIE2_out)
+    //FILES_FOR_CLUSTER = CLIQUE_SNV.out.CLIQUE_out.collect()
+    //CLUSTER(FILES_FOR_CLUSTER)
     //CONSENSUS(TRIM.out.TRIM_out, ALIGNED, ref_file)
     //MODIFY_FASTA(reads, CONSENSUS.out.CONSENSUS_fa)
 
