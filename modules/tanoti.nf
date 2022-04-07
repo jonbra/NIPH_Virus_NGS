@@ -8,7 +8,7 @@ process TANOTI {
     path genome
 
     publishDir "${params.outdir}/2_bam", mode: 'copy', pattern:'*.{bam,bai}'
-    publishDir "${params.outdir}/2_bam/log", mode: 'link', pattern:'*.{stats,sh}'
+    publishDir "${params.outdir}/2_bam/log", mode: 'copy', pattern:'*.{stats,sh,txt}'
 
     output:
     tuple val(sampleName), path ("${sampleName}.major.sorted.bam"), path ("${sampleName}.major.sorted.bam.bai"), emit: TANOTI_out
@@ -53,7 +53,8 @@ process TANOTI {
     echo \${SEQ2} >> ${sampleName}_MAPPING_info.txt
 
     # Then remove duplicates
-    samtools fixmate -m - ${sampleName}.major.sorted.bam \
+    samtools sort -n ${sampleName}.major.sorted.bam \
+      | samtools fixmate -m - - \
       | samtools sort -O BAM \
       | samtools markdup --no-PG -r - ${sampleName}.markdup.bam
 
