@@ -1,6 +1,6 @@
 process BOWTIE {
     tag "$sampleName"
-    errorStrategy 'ignore'
+    //errorStrategy 'ignore'
 
     label 'large'
 
@@ -13,7 +13,7 @@ process BOWTIE {
     publishDir "${params.outdir}/2_bam/log", mode: 'link', pattern:'*.{stats,log,sh,txt}'
 
     output:
-    tuple val(sampleName), path ("${sampleName}.major.sorted.bam"), path ("${sampleName}.major.sorted.bam.bai"), emit: BOWTIE2_out
+    tuple val(sampleName), path ("${sampleName}.markdup.bam"), path ("${sampleName}.markdup.bam.bai"), emit: BOWTIE2_out
     path "*.log", emit: BOWTIE2_log
     path "*.{stats,sh,txt}"
 
@@ -56,6 +56,18 @@ process BOWTIE {
     SEQ2=\$(grep 'reads mapped:' ${sampleName}.major.sorted.bam.stats | cut -f3)
     echo \${SEQ2} >> ${sampleName}_MAPPING_info.txt
 
+    # Then remove duplicates
+    samtools sort -n ${sampleName}.major.sorted.bam \
+      | samtools fixmate -m - - \
+      | samtools sort -O BAM \
+      | samtools markdup --no-PG -r - ${sampleName}.markdup.bam
+
+    samtools index ${sampleName}.markdup.bam
+
+    samtools stats ${sampleName}.markdup.bam > ${sampleName}.markdup.bam.stats
+
+    SEQ3=\$(grep 'reads mapped:' ${sampleName}.markdup.bam.stats | cut -f3)
+    echo \${SEQ3} >> ${sampleName}_MAPPING_info.txt
 
     cp .command.sh ${sampleName}.bowtie2.sh
     """
