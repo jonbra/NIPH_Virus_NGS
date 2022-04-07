@@ -1,6 +1,5 @@
 process TANOTI {
     tag "$sampleName"
-    errorStrategy 'ignore'
 
     label 'large'
 
@@ -52,6 +51,18 @@ process TANOTI {
 
     SEQ2=\$(grep 'reads mapped:' ${sampleName}.major.sorted.bam.stats | cut -f3)
     echo \${SEQ2} >> ${sampleName}_MAPPING_info.txt
+
+    # Then remove duplicates
+    samtools fixmate -m - ${sampleName}.major.sorted.bam \
+      | samtools sort -O BAM \
+      | samtools markdup --no-PG -r - ${sampleName}.markdup.bam
+
+    samtools index ${sampleName}.markdup.bam
+
+    samtools stats ${sampleName}.markdup.bam > ${sampleName}.markdup.bam.stats
+
+    SEQ3=\$(grep 'reads mapped:' ${sampleName}.markdup.bam.stats | cut -f3)
+    echo \${SEQ3} >> ${sampleName}_MAPPING_info.txt
 
     cp .command.sh ${sampleName}.tanoti.sh
     """
