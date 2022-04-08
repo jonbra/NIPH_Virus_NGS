@@ -38,7 +38,8 @@ include { FASTQC as FASTQC_TRIM } from "$nf_mod_path/fastqc.nf"
 include { INDEX } from "$nf_mod_path/index.nf"
 include { BOWTIE } from "$nf_mod_path/bowtie2.nf"
 include { TANOTI } from "$nf_mod_path/tanoti.nf"
-//include { CLIQUE_SNV } from "$nf_mod_path/cliquesnv.nf"
+include { MODIFY_BAM } from "$nf_mod_path/modify_bam_for_clique.nf"
+include { CLIQUE_SNV } from "$nf_mod_path/cliquesnv.nf"
 //include { CLUSTER } from "$nf_mod_path/clustering.nf"
 //include { CONSENSUS} from "$nf_mod_path/consensus.nf"
 //include { MODIFY_FASTA } from "$nf_mod_path/modify_fasta.nf"
@@ -48,7 +49,7 @@ workflow {
     main:
     if (params.test) {
         reads = Channel
-                .fromSRA(["SRR11939535", "SRR12473500"])
+                .fromSRA(["SRR1762355", "SRR1762354"])
                 .map{ tuple(it[0], it[1][0], it[1][1]) }
     }
     else {
@@ -73,7 +74,8 @@ workflow {
         ALIGNED = TANOTI.out.TANOTI_out
     }
 
-    //CLIQUE_SNV(BOWTIE.out.BOWTIE2_out)
+    MODIFY_BAM(ALIGNED)
+    CLIQUE_SNV(MODIFY_BAM.out.MODIFY_BAM_out)
     //FILES_FOR_CLUSTER = CLIQUE_SNV.out.CLIQUE_out.collect()
     //CLUSTER(FILES_FOR_CLUSTER)
     //CONSENSUS(TRIM.out.TRIM_out, ALIGNED, ref_file)
