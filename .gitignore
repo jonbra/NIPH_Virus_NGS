@@ -5,3 +5,5 @@ HCV-nf/*
 Data/Raw_files/*
 Run712*/*
 Test*/
+Bowtie_test/*
+Tanoti_test/*

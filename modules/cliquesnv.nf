@@ -6,12 +6,14 @@ process CLIQUE_SNV {
   path samfile
 
   output:
-  path ("TEST/*.fasta"), emit: CLIQUE_out
-  path "TEST/*.json"
+  path ("*.fasta"), emit: CLIQUE_out
+  path "*.json"
 
   script:
   """
-  cliquesnv -m snv-illumina -threads $task.cpus -outDir TEST -in ${samfile} -fdf extended
+  mkdir TEST
+  java -jar /usr/local/bin/clique-snv.jar -m snv-illumina -threads $task.cpus -outDir TEST -in ${samfile} -fdf extended
+  #cliquesnv -m snv-illumina -threads $task.cpus -outDir TEST -in ${samfile} -fdf extended
   """
 
 }
