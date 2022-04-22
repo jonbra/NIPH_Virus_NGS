@@ -12,8 +12,8 @@ process CLIQUE_SNV {
   script:
   """
   mkdir TEST
-  java -jar /usr/local/bin/clique-snv.jar -m snv-illumina -threads $task.cpus -outDir TEST -in ${samfile} -fdf extended
-  #cliquesnv -m snv-illumina -threads $task.cpus -outDir TEST -in ${samfile} -fdf extended
+  #java -jar /usr/local/bin/clique-snv.jar -m snv-illumina -threads $task.cpu -outDir TEST -in ${samfile} -fdf extended
+  cliquesnv -m snv-illumina -threads $task.cpu -outDir TEST -in ${samfile} -fdf extended
   """
 
 }
