@@ -8,7 +8,6 @@ process MODIFY_FASTA {
   tuple val(sampleName), path(read1), path(read2)
   path consensus
 
-
   output:
   path "*.fa"
 
