@@ -17,7 +17,7 @@ process CONSENSUS {
 
   """
   samtools stats ${sampleName}.markdup.bam > ${sampleName}.markdup.bam.stats
-  SEQ=\$(grep 'reads mapped:' *.markdup.bam.stats | cut -f3)
+  SEQ=\$(grep 'reads mapped:' ${sampleName}.markdup.bam.stats | cut -f3)
 
   if [[ \$SEQ -gt 499 ]]
   then
@@ -31,7 +31,7 @@ process CONSENSUS {
 
     # Get the coverage for each position
     bedtools genomecov -bga -ibam ${sampleName}.markdup.bam | awk '\$4 < 6' > regionswithlessthan6coverage.bed
-    bcftools consensus -m regionswithlessthan6coverage.bed -f "\${major}".fa calls.vcf.gz -o ${sampleName}.major_consensus.fa
+    bcftools consensus -m regionswithlessthan6coverage.bed -f "\${major}".fa ${sampleName}.calls.vcf.gz -o ${sampleName}.major_consensus.fa
 
   else
     echo 'Less than 500 reads (duplicates removed) mapped to best reference'> ${sampleName}_CONSENSUS_info.txt
