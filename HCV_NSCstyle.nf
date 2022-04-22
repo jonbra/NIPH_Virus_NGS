@@ -2,7 +2,7 @@ nextflow.enable.dsl=2
 
 pipeline_version = "dev"
 params.pipeline_version = pipeline_version // For use in modules
-params.cpu=4
+params.cpus=4
 nf_mod_path = "$baseDir/modules"
 
 // **********************************************************************************
@@ -39,10 +39,10 @@ include { INDEX } from "$nf_mod_path/index.nf"
 include { BOWTIE } from "$nf_mod_path/bowtie2.nf"
 include { TANOTI } from "$nf_mod_path/tanoti.nf"
 include { MODIFY_BAM } from "$nf_mod_path/modify_bam_for_clique.nf"
-//include { CLIQUE_SNV } from "$nf_mod_path/cliquesnv.nf"
+include { CLIQUE_SNV } from "$nf_mod_path/cliquesnv.nf"
 //include { CLUSTER } from "$nf_mod_path/clustering.nf"
-include { CONSENSUS} from "$nf_mod_path/consensus.nf"
-include { MODIFY_FASTA } from "$nf_mod_path/modify_fasta.nf"
+//include { CONSENSUS} from "$nf_mod_path/consensus.nf"
+//include { MODIFY_FASTA } from "$nf_mod_path/modify_fasta.nf"
 include { MULTIQC } from "$nf_mod_path/multiqc.nf"
 
 workflow {
@@ -75,11 +75,11 @@ workflow {
     }
 
     MODIFY_BAM(ALIGNED)
-    //CLIQUE_SNV(MODIFY_BAM.out.MODIFY_BAM_out)
+    CLIQUE_SNV(MODIFY_BAM.out.MODIFY_BAM_out)
     //FILES_FOR_CLUSTER = CLIQUE_SNV.out.CLIQUE_out.collect()
     //CLUSTER(FILES_FOR_CLUSTER)
-    CONSENSUS(ALIGNED, ref_file)
-    MODIFY_FASTA(reads, CONSENSUS.out.CONSENSUS_fa)
+    //CONSENSUS(ALIGNED, ref_file)
+    //MODIFY_FASTA(reads, CONSENSUS.out.CONSENSUS_fa)
 
     // MultiQC -- Needs input from all FastQC and fastp reports
     if ( params.align_tool == "bowtie2" ) {
