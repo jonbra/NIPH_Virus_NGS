@@ -10,5 +10,5 @@ Example usage (you need to have nextflow installed):
 git clone https://github.com/jonbra/learning_nextflow.git
 cd learning_nextflow
 mkdir Bowtie_SRA
-sudo nextflow run HCV_NSCstyle.nf --cpu 8 --use_docker --align_tool "bowtie2" --outpath "Bowtie_SRA" --test
+nextflow run HCV_NSCstyle.nf --cpu 8 --use_docker --align_tool "bowtie2" --outpath "Bowtie_SRA" --test
 ```
