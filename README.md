@@ -12,3 +12,6 @@ cd learning_nextflow
 mkdir Bowtie_SRA
 nextflow run HCV_NSCstyle.nf --cpu 8 --use_docker --align_tool "bowtie2" --outpath "Bowtie_SRA" --test
 ```
+
+ToDo:
+[] Add parameter --ref_file that is a path to a reference fasta
