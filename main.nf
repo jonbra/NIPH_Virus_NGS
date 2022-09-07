@@ -4,6 +4,7 @@ nf_mod_path = "$baseDir/modules"
 //kraken_db = "$baseDir/Data/Kraken_db/k2_viral_20220607.tar.gz"
 kraken_db = "$baseDir/Data/Kraken_db/"
 blast_db = "$baseDir/Data/Blast_db/HCVgenosubtypes_8.5.19_clean.fa"
+ref_file = "$baseDir/Data/References/3a_D17763.fa"
 params.cpus=4
 params.outdir = params.outpath + "/results/"
 params.taxid = 11102 // Hepacivirus default
@@ -17,6 +18,7 @@ include { SUBSET_KRAKEN2 } from "$nf_mod_path/subset_kraken2.nf"
 include { SPADES } from "$nf_mod_path/spades.nf"
 include { MULTIQC } from "$nf_mod_path/multiqc.nf"
 include { BLASTN } from "$nf_mod_path/blastn.nf"
+include { ABACAS } from "$nf_mod_path/abacas.nf"
 
 workflow {
   reads = Channel
@@ -35,6 +37,7 @@ workflow {
     SUBSET_KRAKEN2(TRIM.out.TRIM_out, KRAKEN2.out.report, KRAKEN2.out.classified_reads_assignment)
     SPADES(SUBSET_KRAKEN2.out.subset_reads_fastq)
     BLASTN(SPADES.out.scaffolds, blast_db)
+    ABACAS(SPADES.out.scaffolds, ref_file)
   }
 
   // MultiQC -- Needs input from all FastQC and fastp reports
