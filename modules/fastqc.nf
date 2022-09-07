@@ -1,7 +1,7 @@
 process FASTQC {
     tag "FASTQC on $sampleName"
     publishDir "${params.outdir}/1_fastqc/", mode:'copy', pattern:'*.{zip}'
-    publishDir "${params.outdir}/1_fastqc/log", mode:'link', pattern:'*.{log,sh}'
+    publishDir "${params.outdir}/1_fastqc/log", mode:'copy', pattern:'*.{log,sh}'
 
     errorStrategy { task.exitStatus == 143 ? 'retry' : 'ignore' }
 

@@ -7,7 +7,7 @@ process BOWTIE {
     path genome
     path genome_index
 
-    publishDir "${params.outdir}/2_bam", mode: 'link', pattern:'*.{bam,bai}'
+    publishDir "${params.outdir}/2_bam", mode: 'copy', pattern:'*markdup.{bam,bai}'
     publishDir "${params.outdir}/2_bam/log", mode: 'copy', pattern:'*.{stats,log,sh,txt}'
 
     output:

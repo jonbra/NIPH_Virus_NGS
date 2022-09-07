@@ -1,5 +1,5 @@
 process TRIM {
-    tag "TRIM on $sampleName"
+  
     publishDir "${params.outdir}/trimmed", mode:'copy'
 
     input:

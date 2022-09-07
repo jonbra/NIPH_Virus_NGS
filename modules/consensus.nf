@@ -3,16 +3,16 @@ process CONSENSUS {
 
 
   publishDir "${params.outdir}/3_consensus", mode: 'copy', pattern:'*.{fa,csi,bed,gz}'
-  publishDir "${params.outdir}/3_consensus/log", mode: 'link', pattern:'*.{stats,txt,sh}'
+  publishDir "${params.outdir}/3_consensus/log", mode: 'copy', pattern:'*.{log,txt,sh}'
 
   input:
   tuple val(sampleName), path ("${sampleName}.markdup.bam"), path ("${sampleName}.markdup.bam.bai")
   path genome
 
   output:
-  path "*.major_consensus.fa", emit: CONSENSUS_fa
-  path "*.{gz,csi,bed}"
-  path "*.txt"
+  path "*.major_consensus.fa", emit: CONSENSUS_fa, optional: true
+  path "*.{gz,csi,bed}", optional: true
+  path "*.{log,sh,txt}"
 
 
   """
@@ -30,11 +30,13 @@ process CONSENSUS {
     samtools index ${sampleName}.markdup.bam
 
     # Get the coverage for each position
-    bedtools genomecov -bga -ibam ${sampleName}.markdup.bam | awk '\$4 < 6' > regionswithlessthan6coverage.bed
-    bcftools consensus -m regionswithlessthan6coverage.bed -f "\${major}".fa ${sampleName}.calls.vcf.gz -o ${sampleName}.major_consensus.fa
+    bedtools genomecov -bga -ibam ${sampleName}.markdup.bam | awk '\$4 < 6' > ${sampleName}.regionswithlessthan6coverage.bed
+    bcftools consensus -m ${sampleName}.regionswithlessthan6coverage.bed -f "\${major}".fa ${sampleName}.calls.vcf.gz -o ${sampleName}.major_consensus.fa
 
   else
     echo 'Less than 500 reads (duplicates removed) mapped to best reference'> ${sampleName}_CONSENSUS_info.txt
   fi
+  cp .command.log ${sampleName}.consensus.log
+  cp .command.sh ${sampleName}.consensus.sh
   """
 }

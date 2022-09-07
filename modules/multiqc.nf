@@ -10,8 +10,8 @@ process MULTIQC {
     path '0_multiqc_data'
     path 'all.multiqc.{log,sh}'
 
-    publishDir "${params.outdir}/1_multiqc/", mode: 'link', pattern:'0_multiqc_*'
-    publishDir "${params.outdir}/1_multiqc/log", mode: 'link', pattern:'all.multiqc.*'
+    publishDir "${params.outdir}/multiqc/", mode: 'copy', pattern:'0_multiqc_*'
+    publishDir "${params.outdir}/multiqc/log", mode: 'copy', pattern:'all.multiqc.*'
 
     script:
     """

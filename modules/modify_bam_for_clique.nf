@@ -1,12 +1,12 @@
 process MODIFY_BAM {
 
-  publishDir "${params.outdir}/2_clique_snv/", mode:'copy', pattern:'*.{txt}'
+  publishDir "${params.outdir}/2_clique_snv/", mode:'copy', pattern:'*.{txt,sam}'
 
   input:
   tuple val(sampleName), path ("${sampleName}.markdup.bam"), path ("${sampleName}.markdup.bam.bai")
 
   output:
-  path ("*_modified.sam"), emit: MODIFY_BAM_out
+  path ("*_modified.sam"), emit: MODIFY_BAM_out, optional: true
   path "*.txt"
 
   script:
