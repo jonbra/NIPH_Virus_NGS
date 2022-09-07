@@ -16,7 +16,7 @@ process BLASTN {
     makeblastdb \\
         -in $blast_db \\
         -dbtype nucl
-        
+
     blastn \\
         -db $blast_db \\
         -query $scaffolds \\
@@ -30,3 +30,9 @@ process BLASTN {
     END_VERSIONS
     """
 }
+
+/*
+Tasks:
+1. Add header to blast out file - maybe not?
+2. Extract pairs of query and hit
+*/
