@@ -7,7 +7,8 @@ nf_mod_path = "$baseDir/modules"
 
 // **********************************************************************************
 
-ref_file = "$baseDir/Data/References/HCVgenosubtypes_8.5.19_clean.fa"
+// ref_file = "$baseDir/Data/References/HCVgenosubtypes_8.5.19_clean.fa"
+ref_file = "$baseDir/Data/References/NC_001405.fasta"
 
 params.align_tool = "bowtie2"
 params.outdir = params.outpath + "/results/"
@@ -16,7 +17,7 @@ params.outdir = params.outpath + "/results/"
 File pipeline_tool_file = new File("$params.outpath/pipeline_info.txt")
 pipeline_tool_file.write '\n' +
                          'Pipeline:\t' + pipeline_version + '\n' +
-                         '\n' +
+                         'Reference:\t' + ref_file + '\n' +
                          'RunFolder:\t' + params.outpath + '\n' +
                          'SampleSheet:\t' + params.samplelist + '\n' +
                          'Mapper:\t\t' + params.align_tool + '\n' +
