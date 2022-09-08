@@ -18,7 +18,7 @@ include { SUBSET_KRAKEN2 } from "$nf_mod_path/subset_kraken2.nf"
 include { SPADES } from "$nf_mod_path/spades.nf"
 include { MULTIQC } from "$nf_mod_path/multiqc.nf"
 include { BLASTN } from "$nf_mod_path/blastn.nf"
-include { ABACAS } from "$nf_mod_path/abacas.nf"
+//include { ABACAS } from "$nf_mod_path/abacas.nf"
 
 workflow {
   reads = Channel
@@ -37,7 +37,7 @@ workflow {
     SUBSET_KRAKEN2(TRIM.out.TRIM_out, KRAKEN2.out.report, KRAKEN2.out.classified_reads_assignment)
     SPADES(SUBSET_KRAKEN2.out.subset_reads_fastq)
     BLASTN(SPADES.out.scaffolds, blast_db)
-    ABACAS(SPADES.out.scaffolds, ref_file)
+    //ABACAS(SPADES.out.scaffolds, ref_file)
   }
 
   // MultiQC -- Needs input from all FastQC and fastp reports
