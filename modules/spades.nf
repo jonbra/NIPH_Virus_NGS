@@ -14,11 +14,10 @@ process SPADES {
     task.ext.when == null || task.ext.when
 
     script:
-
     """
     spades.py \\
         --threads $task.cpus \\
-        --meta \\
+        --rnaviral \\
         -1 $read1 \\
         -2 $read2 \\
         -o ./
