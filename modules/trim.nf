@@ -2,6 +2,8 @@ process TRIM {
   
     publishDir "${params.outdir}/trimmed", mode:'copy'
 
+    label 'small'
+
     input:
     tuple val(sampleName), path(read1), path(read2)
 

@@ -2,6 +2,8 @@ process SUBSET_KRAKEN2 {
 
     publishDir "${params.outdir}/kraken2/", mode:'copy', pattern:'*.{fastq}'
 
+    label 'small'
+
     input:
     tuple val(sampleName), path(read1), path(read2)
     path report

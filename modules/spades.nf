@@ -4,6 +4,8 @@ process SPADES {
     // Perhaps better to use an if statement to only execute the process in case there are reads in the input file
     errorStrategy 'ignore'
 
+    label 'large'
+
     publishDir "${params.outdir}/spades/", mode:'copy', pattern:'*.{fa,txt,log,yml}'
 
     input:

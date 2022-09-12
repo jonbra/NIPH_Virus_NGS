@@ -2,6 +2,8 @@ process KRAKEN2 {
 
     publishDir "${params.outdir}/kraken2/", mode:'copy', pattern:'*.{fastq,txt,yml}'
 
+    label 'small'
+
     input:
     tuple val(sampleName), path(read1), path(read2)
     path  kraken_db
