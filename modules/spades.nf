@@ -1,5 +1,9 @@
 process SPADES {
 
+    // Sometimes there can be zero reads after SUBSET_KRAKEN2, in which case Spades will crash.
+    // Perhaps better to use an if statement to only execute the process in case there are reads in the input file
+    errorStrategy 'ignore'
+
     publishDir "${params.outdir}/spades/", mode:'copy', pattern:'*.{fa,txt,log,yml}'
 
     input:
