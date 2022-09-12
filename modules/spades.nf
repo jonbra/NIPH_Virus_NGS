@@ -29,6 +29,9 @@ process SPADES {
         -o ./
 
     mv spades.log ${sampleName}.spades.log
+    if [ -f warnings.log ]; then
+        mv warnings.log ${sampleName}.warnings.log
+    fi    
     
     if [ -f scaffolds.fasta ]; then
         mv scaffolds.fasta ${sampleName}.scaffolds.fa
