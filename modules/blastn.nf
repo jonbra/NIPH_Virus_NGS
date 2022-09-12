@@ -1,6 +1,6 @@
 process BLASTN {
 
-    publishDir "${params.outdir}/blast/", mode:'copy', pattern:'*.{out,yml}'
+    publishDir "${params.outdir}/5_blast/", mode:'copy', pattern:'*.{out,yml}'
 
     input:
     tuple val(sampleName), path(scaffolds)

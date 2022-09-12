@@ -1,6 +1,6 @@
 process KRAKEN2 {
 
-    publishDir "${params.outdir}/kraken2/", mode:'copy', pattern:'*.{fastq,txt,yml}'
+    publishDir "${params.outdir}/3_kraken2/", mode:'copy', pattern:'*.{fastq,txt,yml}'
 
     label 'small'
 

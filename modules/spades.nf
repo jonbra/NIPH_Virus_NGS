@@ -6,7 +6,7 @@ process SPADES {
 
     label 'large'
 
-    publishDir "${params.outdir}/spades/", mode:'copy', pattern:'*.{fa,txt,log,yml}'
+    publishDir "${params.outdir}/4_spades/", mode:'copy', pattern:'*.{fa,txt,log,yml}'
 
     input:
     tuple val(sampleName), path(read1), path(read2)

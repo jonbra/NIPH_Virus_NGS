@@ -1,6 +1,6 @@
 process SUBSET_KRAKEN2 {
 
-    publishDir "${params.outdir}/kraken2/", mode:'copy', pattern:'*.{fastq}'
+    publishDir "${params.outdir}/3_kraken2/", mode:'copy', pattern:'*.{fastq}'
 
     label 'small'
 
@@ -22,7 +22,7 @@ process SUBSET_KRAKEN2 {
         -r $report \\
         -t ${params.taxid} \\
         --include-children \\
-        -s $read1 \\
+        -s1 $read1 \\
         -s2 $read2 \\
         -o ${sampleName}_taxid_${params.taxid}_R1.fastq \\
         -o2 ${sampleName}_taxid_${params.taxid}_R2.fastq \\

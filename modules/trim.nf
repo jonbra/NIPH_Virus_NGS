@@ -1,6 +1,6 @@
 process TRIM {
   
-    publishDir "${params.outdir}/trimmed", mode:'copy'
+    publishDir "${params.outdir}/2_trimmed", mode:'copy'
 
     label 'small'
 
