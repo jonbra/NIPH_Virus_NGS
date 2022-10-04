@@ -4,7 +4,6 @@ nf_mod_path = "$baseDir/modules"
 // Kraken viral db built on june 7 2022 downloaded from https://benlangmead.github.io/aws-indexes/k2.
 // Custom set of HCV subtypes added. Same sequences as in HCVgenosubtypes_8.5.19_clean.fa
 kraken_db = "$baseDir/Data/Kraken_db/"
-kraken_hcv_db = "$baseDir/Data/Kraken_db/HCV/"
 blast_db = "$baseDir/Data/Blast_db/HCVgenosubtypes_8.5.19_clean.fa"
 ref_file = "$baseDir/Data/References/3a_D17763.fa"
 params.cpus=4
