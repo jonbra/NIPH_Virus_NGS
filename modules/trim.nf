@@ -1,5 +1,7 @@
 process TRIM {
   
+    container 'quay.io/biocontainers/cutadapt:3.7--py37h8902056_1'
+
     publishDir "${params.outdir}/2_trimmed", mode:'copy'
 
     label 'small'

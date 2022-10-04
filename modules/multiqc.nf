@@ -1,5 +1,7 @@
 process MULTIQC {
 
+    container 'quay.io/biocontainers/multiqc:1.12--pyhdfd78af_0'
+
     label 'small'
 
     input:

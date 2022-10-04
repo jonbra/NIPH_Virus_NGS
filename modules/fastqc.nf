@@ -1,4 +1,7 @@
 process FASTQC {
+
+    container 'quay.io/biocontainers/fastqc:0.11.9--hdfd78af_1'
+    
     tag "FASTQC on $sampleName"
     publishDir "${params.outdir}/1_fastqc/", mode:'copy', pattern:'*.{zip}'
     publishDir "${params.outdir}/1_fastqc/log", mode:'copy', pattern:'*.{log,sh}'

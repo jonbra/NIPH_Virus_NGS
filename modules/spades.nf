@@ -1,5 +1,7 @@
 process SPADES {
 
+    container 'quay.io/biocontainers/spades:3.15.4--h95f258a_0'
+
     // Sometimes there can be zero reads after SUBSET_KRAKEN2, in which case Spades will crash.
     // Perhaps better to use an if statement to only execute the process in case there are reads in the input file
     errorStrategy 'ignore'

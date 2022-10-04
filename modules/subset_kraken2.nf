@@ -1,5 +1,7 @@
 process SUBSET_KRAKEN2 {
 
+    container 'quay.io/biocontainers/krakentools:1.2--pyh5e36f6f_0'
+
     publishDir "${params.outdir}/3_kraken2/", mode:'copy', pattern:'*.{fastq}'
 
     label 'small'
