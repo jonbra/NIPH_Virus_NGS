@@ -13,6 +13,7 @@ process MULTIQC {
     path 'all.multiqc.{log,sh}'
 
     publishDir "${params.outdir}/6_multiqc/", mode: 'copy', pattern:'*multiqc_*'
+    publishDir "${params.outdir}/6_multiqc/", mode: 'copy', pattern:'*.yml'
 
     script:
     """
