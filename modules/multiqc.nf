@@ -22,5 +22,10 @@ process MULTIQC {
 
     cp .command.sh all.multiqc.sh
     cp .command.log all.multiqc.log
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        multiqc: \$( multiqc --version | sed -e "s/multiqc, version //g" )
+    END_VERSIONS
     """
 }

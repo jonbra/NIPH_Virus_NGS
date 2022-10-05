@@ -19,5 +19,10 @@ process INDEX {
     bowtie2-build --seed 1 $genome $genome
     cp .command.log bowtie2_index.log
     cp .command.sh bowtie2_index.sh
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        bowtie2: \$(echo \$(bowtie2 --version 2>&1) | sed 's/^.*bowtie2-align-s version //; s/ .*\$//')
+    END_VERSIONS
     """
 }
