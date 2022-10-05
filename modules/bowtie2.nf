@@ -1,6 +1,11 @@
-process BOWTIE {
+process BOWTIE2 {
+
+    container 'jonbra/viral_haplo:1.2'
+
     tag "$sampleName"
     //errorStrategy 'ignore'
+
+    label 'small'
 
     input:
     tuple val(sampleName), path(read1), path(read2)

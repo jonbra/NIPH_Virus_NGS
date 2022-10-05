@@ -1,4 +1,7 @@
 process TANOTI {
+
+    container 'jonbra/viral_haplo:1.2'
+    
     tag "$sampleName"
 
     label 'large'

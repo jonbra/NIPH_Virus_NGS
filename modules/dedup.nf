@@ -1,6 +1,10 @@
 process DEDUP {
 
+  container 'darcyabjones/bbmap:latest'
+
   tag "DEDUP on $sampleName"
+
+  label 'small'
 
   input:
   tuple val(sampleName), path(read1), path(read2)
