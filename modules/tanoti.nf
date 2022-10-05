@@ -4,7 +4,7 @@ process TANOTI {
     
     tag "$sampleName"
 
-    label 'large'
+    label 'medium'
 
     input:
     tuple val(sampleName), path(read1), path(read2)
