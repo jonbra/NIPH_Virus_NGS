@@ -19,6 +19,10 @@ include { SPADES } from "$nf_mod_path/spades.nf"
 include { MULTIQC } from "$nf_mod_path/multiqc.nf"
 include { BLASTN } from "$nf_mod_path/blastn.nf"
 //include { ABACAS } from "$nf_mod_path/abacas.nf"
+include { INDEX } from "$nf_mod_path/index.nf"
+include { DEDUP } from "$nf_mod_path/dedup.nf"
+include { BOWTIE2 } from "$nf_mod_path/bowtie2.nf"
+include { TANOTI } from "$nf_mod_path/tanoti.nf"
 
 workflow {
   reads = Channel
@@ -37,6 +41,12 @@ workflow {
     SPADES(SUBSET_KRAKEN2.out.subset_reads_fastq)
     BLASTN(SPADES.out.scaffolds, blast_db)
     //ABACAS(SPADES.out.scaffolds, ref_file)
+  }
+
+  if (params.map_to_reference) {
+    DEDUP(TRIM.out.TRIM_out)
+    BOWTIE2(DEDUP.out.DEDUP_out, ref_file, INDEX.out.INDEX_out)
+    TANOTI(DEDUP.out.DEDUP_out, ref_file)
   }
 
   // MultiQC
