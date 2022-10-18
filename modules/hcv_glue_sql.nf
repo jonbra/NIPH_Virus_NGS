@@ -14,11 +14,14 @@ process HCV_GLUE_SQL {
     docker pull cvrbioinformatics/gluetools-mysql:latest
     docker pull cvrbioinformatics/gluetools:latest
 
+    # Start the gluetools-mysql containter
     docker exec gluetools-mysql installGlueProject.sh ncbi_hcv_glue
+
+    # Start the genotyping and resistance analysis
+    # NB: Not working if multiple scaffolds in the scaffolds file
     docker run --rm \
        --name gluetools \
-        -v /home/jonr/NODE_1.fa:/opt/input/${sampleName}.fa \
-#        -v \$PWD/${scaffolds}:/opt/input/${sampleName}.fa \
+        -v \$PWD/${scaffolds}:/opt/input/${sampleName}.fa \
         -v \$PWD:/output \
         -w /opt/input \
         --link gluetools-mysql \
@@ -27,4 +30,4 @@ process HCV_GLUE_SQL {
         log-level:FINEST \
         --inline-cmd project hcv module phdrReportingController invoke-function reportFastaAsHtml /opt/input/${sampleName}.fa /output/${sampleName}.html
     """
-}
+}      
