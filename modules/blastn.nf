@@ -9,7 +9,7 @@ process BLASTN {
     path blast_db
 
     output:
-    path "*blast.out", emit: blastn_out
+    tuple val(sampleName), path('*blast.out')     , optional:true, emit: blastn_out
     path "versions.yml"   
 
     script:
