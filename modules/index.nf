@@ -16,7 +16,7 @@ process INDEX {
 
     script:
     """
-    bowtie2-build --seed 1 $genome $genome
+    bowtie2-build --threads $task.cpus $genome $genome
     cp .command.log bowtie2_index.log
     cp .command.sh bowtie2_index.sh
 
