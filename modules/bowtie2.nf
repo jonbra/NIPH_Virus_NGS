@@ -13,7 +13,7 @@ process BOWTIE2 {
     path genome_index
 
     publishDir "${params.outdir}/2_bam", mode: 'copy', pattern:'*markdup.{bam,bai}'
-    publishDir "${params.outdir}/2_bam/log", mode: 'copy', pattern:'*.{stats,log,sh,txt,yml}'
+    publishDir "${params.outdir}/2_bam", mode: 'copy', pattern:'*.{stats,log,sh,txt,yml}'
 
     output:
     tuple val(sampleName), path ("${sampleName}.markdup.bam"), path ("${sampleName}.markdup.bam.bai"), emit: BOWTIE2_out
