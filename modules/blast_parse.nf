@@ -69,7 +69,7 @@ process BLAST_PARSE {
         # Subset the scaffolds
         geno_fa <- scaffolds_fa[tmp\$X1]
         # Write to file
-        write.fasta(sequences = geno_fa, names = names(geno_fa), file.out = paste0("${sampleName}_", tmp\$genotype[1], "_scaffolds.fa"))
+        write.fasta(sequences = geno_fa, names = names(geno_fa), file.out = paste0(tmp\$genotype[1], "_${sampleName}", "_scaffolds.fa"))
     }
 
     """
