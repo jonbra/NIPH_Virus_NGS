@@ -72,5 +72,7 @@ process BLAST_PARSE {
         write.fasta(sequences = geno_fa, names = names(geno_fa), file.out = paste0(tmp\$genotype[1], "_${sampleName}", "_scaffolds.fa"))
     }
 
+    # Write out sessionInfo() to track versions
+    writeLines(capture.output(sessionInfo()), "R_versions.txt")
     """
 }
