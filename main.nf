@@ -20,7 +20,7 @@ include { SPADES } from "$nf_mod_path/spades.nf"
 include { MULTIQC } from "$nf_mod_path/multiqc.nf"
 include { BLASTN } from "$nf_mod_path/blastn.nf"
 include { BLAST_PARSE } from "$nf_mod_path/blast_parse.nf"
-//include { ABACAS } from "$nf_mod_path/abacas.nf"
+include { ABACAS } from "$nf_mod_path/abacas.nf"
 include { INDEX } from "$nf_mod_path/index.nf"
 include { DEDUP } from "$nf_mod_path/dedup.nf"
 include { BOWTIE2 } from "$nf_mod_path/bowtie2.nf"
@@ -44,7 +44,7 @@ workflow {
     SPADES(SUBSET_KRAKEN2.out.subset_reads_fastq)
     BLASTN(SPADES.out.scaffolds, blast_db)
     BLAST_PARSE(BLASTN.out.blastn_out, blast_db, SPADES.out.scaffolds)
-    //ABACAS(SPADES.out.scaffolds, ref_file)
+    ABACAS(BLAST_PARSE.out.subtypes_references, BLAST_PARSE.out.scaffolds_fasta, BLAST_PARSE.out.genotypes)
   }
 
   if (params.map_to_reference) {
