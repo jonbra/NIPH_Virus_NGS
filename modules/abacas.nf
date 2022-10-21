@@ -1,6 +1,8 @@
 process ABACAS {
 
     container 'quay.io/biocontainers/abacas:1.3.1--pl526_0'
+    
+    errorStrategy 'ignore'
 
     publishDir "${params.outdir}/6_abacas/", mode:'copy', pattern:'*'
 
