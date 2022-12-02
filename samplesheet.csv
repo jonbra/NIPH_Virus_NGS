@@ -1,2 +1,3 @@
 sample,fastq_1,fastq_2
-Virus200604-1,Data/Raw_files/472Virus200604-1/Test_R1.fastq.gz,Data/Raw_files/472Virus200604-1/Test_R2.fastq.gz
+Test_1,Data/Raw_files/472Virus200604-1/Test-1_R1.fastq.gz,Data/Raw_files/472Virus200604-1/Test-1_R2.fastq.gz
+Test_2,Data/Raw_files/472Virus200604-1/Test-2_R1.fastq.gz,Data/Raw_files/472Virus200604-1/Test-2_R2.fastq.gz
