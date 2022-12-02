@@ -53,8 +53,8 @@ workflow {
     // Combine all blast.out files
     //COMBINE_BLAST(BLASTN.out.blastn_out.collect { it[1] })
 
-    Tanke: En mulighet er å vente med Blast_parse til alt er ferdig. Deretter collecte alle blast.out og alle scaffolds og deretter prosessere disse sammen i R_scriptet...
-    BLAST_PARSE(BLASTN.out.blastn_out.collect { it[1] }, blast_db, SPADES.out.scaffolds.collect { it[1] })
+    //Tanke: En mulighet er å vente med Blast_parse til alt er ferdig. Deretter collecte alle blast.out og alle scaffolds og deretter prosessere disse sammen i R_scriptet...
+    //BLAST_PARSE(BLASTN.out.blastn_out.collect { it[1] }, blast_db, SPADES.out.scaffolds.collect { it[1] })
     //ABACAS(BLAST_PARSE.out.subtypes_references, BLAST_PARSE.out.scaffolds_fasta, BLAST_PARSE.out.genotypes)
   }
 
