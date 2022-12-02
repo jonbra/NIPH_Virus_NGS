@@ -6,60 +6,56 @@ library(seqinr)
 # Skip this in nextflow
 setwd("/home/jonr/Prosjekter/learning_nextflow/HCV_results/5_blast/")
 
-blast_out <- list.files(pattern = "out$",
-                        full.names = TRUE)
-
-tmp <- list.files("/home/jonr/Prosjekter/learning_nextflow/HCV_results/5_blast/", full.names = FALSE, pattern = "out$") %>%
+# Read all blast files into a list
+tmp <- list.files(full.names = FALSE, pattern = "out$") %>%
   set_names() %>% # To get the file names as the names of the list elements
   map(read_tsv, col_names = FALSE)
 
-tmp <- Map(function(x) {
-  separate(x,
-           X2, into = c("genotype", NA), remove = FALSE)
-  }, tmp)
+# Reduce the list to a single dataframe. Keep the filenames in column 1
+df <- bind_rows(tmp, .id = "sampleName")
 
-tmp <- Map(function(x) {
-  add_count(x,
-           X2)
-}, tmp)
+# Add column for the genotype
+df <- df %>% 
+  # Fix the sampleName
+  mutate(sampleName = str_remove(sampleName, "_blast.out")) %>% 
+  separate(X2, into = c("genotype", NA), remove = FALSE) %>% 
+  # Count the occurence of each blast subject (i.e. genotype)
+  # To know which of the subtypes are most common
+  group_by(sampleName) %>% 
+  add_count(X2) %>% 
+  ungroup()
 
-#scaffolds <- read_tsv("${blast_out}",
-#                      col_names = FALSE) %>% 
-#  # Add a column for the genotype
-#  separate(X2, into = c("genotype", NA), remove = FALSE) %>% 
-#  # Count the number of each subject
-#  add_count(X2) 
+# Reduce to info on genotypes per group
+geno_list <- df %>% 
+  group_by(sampleName) %>% 
+  distinct(genotype) %>% 
+  group_split()
 
-# Skrive ut listenavnet pluss eventuelle genotyper tilstede. 
-# Lagre outputet som et eget object
-# Which genotypes are present?
-tibble::tribble(
-  ~"sampleName", ~"Genotypes"
-)
-for (i in 1:length(tmp)) {
-  print(names(tmp[i]) %>% str_remove("_blast.out"))
-  print(tmp[[i]] %>% distinct(genotype))
+# Write genotypes to file
+for (i in 1:length(geno_list)) {
+  write_tsv(geno_list[[i]], file = paste0(geno_list[[i]][["sampleName"]][1], "_genotypes.tsv"))
 }
 
-genotypes <- scaffolds %>% 
-  distinct(genotype)
-
-write_tsv(genotypes, paste0("${sampleName}", "_genotypes.tsv"))
-
 # What is the most common subtype per genotype?
-subtypes <- scaffolds %>% 
-  group_by(genotype) %>% 
-  slice_max(n, n = 1) %>% 
+subtypes <- df %>% 
+  group_by(sampleName, genotype) %>% 
+  slice(max(n, n = 1)) %>% 
   distinct(X2)
+#subtypes <- scaffolds %>% 
+#  group_by(genotype) %>% 
+#  slice_max(n, n = 1) %>% 
+#  distinct(X2)
 
 # Read the reference fasta file
-fasta <- read.fasta(file = "${references}")
+fasta <- read.fasta(file = "../../Data/Blast_db/HCVgenosubtypes_8.5.19_clean.fa")
 
-# Write out the name of each subtype
+# Write out the name of each subtype and the corresponding fasta file
 for (i in 1:nrow(subtypes)) {
-  write_tsv(subtypes[i, 1], file = paste0("${sampleName}_", subtypes\$X2[i], ".txt"), col_names = FALSE)
-  write.fasta(sequences = fasta[[subtypes\$X2[i]]], names = subtypes\$X2[i], file.out = paste0("${sampleName}_", subtypes\$X2[i], "_ref.fa"))
+  write_tsv(subtypes[i, 1], file = paste0(subtypes[i, 1], subtypes[i, 2], ".txt"), col_names = FALSE)
+  write.fasta(sequences = fasta[[subtypes$X2[i]]], names = subtypes$X2[i], file.out = paste0(subtypes[i, 1], "_", subtypes[i, 2], "_ref.fa"))
 } 
+
+# Divide the scaffolds into the different genotypes
 
 # NB! Dette er spades scaffolds som blir lest?? Blir ikke riktig å splitte slik?
 # Split scaffolds per subtype
