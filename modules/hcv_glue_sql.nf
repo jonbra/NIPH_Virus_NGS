@@ -17,6 +17,8 @@ process HCV_GLUE_SQL {
     # Start the gluetools-mysql containter
     docker exec gluetools-mysql installGlueProject.sh ncbi_hcv_glue
 
+    # Make a for loop over all consensus-sequences
+
     # Start the genotyping and resistance analysis
     # NB: Not working if multiple scaffolds in the scaffolds file
     docker run --rm \

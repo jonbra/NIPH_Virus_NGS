@@ -9,7 +9,7 @@ process ABACAS {
     input:
     path reference 
     path scaffolds
-    tuple val(sampleName), path('*.tsv')
+    tuple val(sampleName), path(genotypes)
 
     output:
     tuple val(sampleName), path('*.abacas*'), emit: abacas_results
@@ -20,25 +20,30 @@ process ABACAS {
 
     script:
     """
+
+    # TODO: Få inn samplename også i fasta-headerne
+    
     for i in \$(ls *scaffolds.fa)
     do
-    # Extract the first characters before underscore
-    GENO=\$(echo \$i | cut -d'_' -f 1)
-    # Pull out the reference
-    REF=\$(ls \$GENO*ref.fa)
-    # Pull out the coresponding scaffolds
-    SCAF=\$(ls \$GENO*scaffolds.fa)
+        # Extract the second field (genotype) when cut on underscore
+        GENO=\$(echo \$i | cut -d'_' -f 2)
+        # Extract the first field (samplename) when cut on underscore
+        # SAMPLE=\$(echo \$i | cut -d'_' -f 1)
+        # Pull out the reference
+        REF=\$(ls \$GENO*ref.fa)
+        # Pull out the coresponding scaffolds
+        SCAF=\$(ls \$GENO*scaffolds.fa)
 
-    # Run ABACAS
-    abacas.pl \\
-        -r \$REF \\
-        -q \$SCAF \\
-        -p nucmer \\
-        -o ${sampleName}_\$GENO.abacas
-    mv nucmer.delta ${sampleName}.abacas.nucmer.delta
-    mv nucmer.filtered.delta ${sampleName}.abacas.nucmer.filtered.delta
-    mv nucmer.tiling ${sampleName}.abacas.nucmer.tiling
-    mv unused_contigs.out ${sampleName}.abacas.unused.contigs.out
+        # Run ABACAS
+        abacas.pl \\
+            -r \$REF \\
+            -q \$SCAF \\
+            -p nucmer \\
+            -o ${sampleName}_\$GENO.abacas
+        mv nucmer.delta ${sampleName}.abacas.nucmer.delta
+        mv nucmer.filtered.delta ${sampleName}.abacas.nucmer.filtered.delta
+        mv nucmer.tiling ${sampleName}.abacas.nucmer.tiling
+        mv unused_contigs.out ${sampleName}.abacas.unused.contigs.out
     done
 
     cat <<-END_VERSIONS > versions.yml

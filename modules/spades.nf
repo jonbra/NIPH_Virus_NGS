@@ -3,10 +3,9 @@ process SPADES {
     container 'quay.io/biocontainers/spades:3.15.4--h95f258a_0'
 
     // Sometimes there can be zero reads after SUBSET_KRAKEN2, in which case Spades will crash.
-    // Perhaps better to use an if statement to only execute the process in case there are reads in the input file
     errorStrategy 'ignore'
 
-    label 'large'
+    label 'spades'
 
     publishDir "${params.outdir}/4_spades/", mode:'copy', pattern:'*.{fa,txt,log,yml}'
 
@@ -14,12 +13,9 @@ process SPADES {
     tuple val(sampleName), path(read1), path(read2)
 
     output:
-    tuple val(sampleName), path('*.scaffolds.fa')     , optional:true, emit: scaffolds
-    tuple val(sampleName), path('*.log')                , emit: log
+    tuple val(sampleName), path('*.scaffolds.fa'), emit: scaffolds
+    path('*.log')    
     path "versions.yml"   
-    
-    when:
-    task.ext.when == null || task.ext.when
 
     script:
     """

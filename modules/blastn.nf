@@ -9,7 +9,7 @@ process BLASTN {
     path blast_db
 
     output:
-    tuple val(sampleName), path('*blast.out')     , optional:true, emit: blastn_out
+    tuple val(sampleName), path('*blast.out'), optional:true, emit: blastn_out
     path "versions.yml"   
 
     script:
@@ -36,5 +36,4 @@ process BLASTN {
 /*
 Tasks:
 1. Add header to blast out file - maybe not?
-2. Extract pairs of query and hit
 */

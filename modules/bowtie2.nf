@@ -12,11 +12,12 @@ process BOWTIE2 {
     path genome
     path genome_index
 
-    publishDir "${params.outdir}/2_bam", mode: 'copy', pattern:'*markdup.{bam,bai}'
+    publishDir "${params.outdir}/2_bam", mode: 'copy', pattern:'*.{bam,bai}'
     publishDir "${params.outdir}/2_bam", mode: 'copy', pattern:'*.{stats,log,sh,txt,yml}'
 
     output:
-    tuple val(sampleName), path ("${sampleName}.markdup.bam"), path ("${sampleName}.markdup.bam.bai"), emit: BOWTIE2_out
+    //tuple val(sampleName), path ("${sampleName}.markdup.bam"), path ("${sampleName}.markdup.bam.bai"), optional: true, emit: markdup_out
+    tuple val(sampleName), path ("${sampleName}.sorted.bam"), path ("${sampleName}.sorted.bam.bai"), optional: true, emit: sorted_out
     path "*.log", emit: BOWTIE2_log
     path "*.{stats,sh,txt}"
 
@@ -40,7 +41,18 @@ process BOWTIE2 {
     SEQ=\$(grep 'reads mapped:' ${sampleName}.sorted.bam.stats | cut -f3)
     echo \${SEQ} > ${sampleName}_MAPPING_info.txt
 
-    # Then re-map against the reference with the most mapped reads
+        cp .command.sh ${sampleName}.bowtie2.sh
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        bowtie2: \$(echo \$(bowtie2 --version 2>&1) | sed 's/^.*bowtie2-align-s version //; s/ .*\$//')
+        samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
+    END_VERSIONS
+    """
+}
+
+/*
+# Then re-map against the reference with the most mapped reads
     major="\$(samtools idxstats ${sampleName}.sorted.bam | cut -f 1,3 | sort -k2 -h | tail -1 | cut -f1)" # Reference with most reads
     echo "\${major}" >> ${sampleName}_MAPPING_info.txt
     samtools faidx ${genome} "\${major}" > "\${major}".fa # Get the fasta sequence
@@ -72,13 +84,4 @@ process BOWTIE2 {
 
     SEQ3=\$(grep 'reads mapped:' ${sampleName}.markdup.bam.stats | cut -f3)
     echo \${SEQ3} >> ${sampleName}_MAPPING_info.txt
-
-    cp .command.sh ${sampleName}.bowtie2.sh
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        bowtie2: \$(echo \$(bowtie2 --version 2>&1) | sed 's/^.*bowtie2-align-s version //; s/ .*\$//')
-        samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
-    END_VERSIONS
-    """
-}
+*/
