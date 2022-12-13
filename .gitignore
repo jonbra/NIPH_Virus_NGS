@@ -1,6 +1,8 @@
 .nextflow*
 work/*
 results/*
+HCV_results/*
+RVA_results/*
 HCV-nf/*
 Data/Raw_files/*
 Data/Kraken_db/*
