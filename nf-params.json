@@ -1,0 +1,8 @@
+{
+    "agens": "HCV",
+    "samplelist": "samplesheet.csv",
+    "outdir": "HCV_results",
+    "kraken_all": "\/media\/jonr\/SATA6TB1\/Kraken_db\/", // PlusPFP database compiled by Ben Langmead on 9. December 2022
+    "kraken_focused": "\/Data\/Kraken_db\/db_hepacivirus", // NCBI Hepacivirus genomes with HCV genotypes from NCBI added 
+    "blast": "\/Data\/Blast_db\/HCVgenosubtypes_8.5.19_clean.fa" // Custom set of HCV fasta files representing different genotypes
+}
