@@ -1,5 +1,7 @@
 process HCV_GLUE_SQL {
 
+    container 'ubuntu:18.04'
+
     publishDir "${params.outdir}/7_glue", mode:'copy', pattern: '*.{html}'
 
     input:
