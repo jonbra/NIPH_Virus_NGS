@@ -22,6 +22,9 @@ include { SPADES } from "$nf_mod_path/spades.nf"
 include { MULTIQC } from "$nf_mod_path/multiqc.nf"
 include { BLASTN } from "$nf_mod_path/blastn.nf"
 include { BLAST_PARSE } from "$nf_mod_path/blast_parse.nf"
+include { MAP_TO_GENOTYPES } from "$nf_mod_path/map_to_genotypes.nf"
+include { PLOT_COVERAGE } from "$nf_mod_path/plot_coverage.nf"
+include { SUMMARIZE_MAPPING } from "$nf_mod_path/summarize_mapping.nf"
 //include { ABACAS } from "$nf_mod_path/abacas.nf"
 include { INDEX } from "$nf_mod_path/index.nf"
 include { DEDUP } from "$nf_mod_path/dedup.nf"
@@ -48,7 +51,14 @@ workflow {
     SPADES(KRAKEN2.out.classified_reads_fastq)
     BLASTN(SPADES.out.scaffolds, blast_db)
     BLAST_PARSE(BLASTN.out.blastn_out, blast_db)
+    MAP_TO_GENOTYPES(BLAST_PARSE.out.FOR_MAPPING)
     //ABACAS(BLAST_PARSE.out.subtypes_references, BLAST_PARSE.out.scaffolds_fasta, BLAST_PARSE.out.genotypes)
+
+    // Plot the coverage of all the genotype mappings
+    PLOT_COVERAGE(MAP_TO_GENOTYPES.out.DEPTH.collect())
+
+    // Summarize the mapping statistics for all samples
+    SUMMARIZE_MAPPING(MAP_TO_GENOTYPES.out.STATS.collect())
   }
 
   if (params.map_to_reference) {
