@@ -23,7 +23,7 @@ scaf <- read_tsv(blast_out, col_names = FALSE) %>%
 genotypes <- scaf %>% 
   distinct(genotype)
 
-write_tsv(genotypes, paste0(sampleName, "_genotypes.tsv"))
+write_tsv(genotypes, paste0(sampleName, ".genotypes.tsv"))
 
 # What is the most common subtype per genotype?
 subtypes <- scaf %>% 
@@ -36,8 +36,8 @@ fasta <- read.fasta(file = references)
 
 # Write out the name of each subtype
 for (i in 1:nrow(subtypes)) {
-  write_tsv(subtypes[i, 1], file = paste0(sampleName, "_", subtypes$X2[i], ".txt"), col_names = FALSE)
-  write.fasta(sequences = fasta[[subtypes$X2[i]]], names = subtypes$X2[i], file.out = paste0(sampleName, "_", subtypes$X2[i], "_ref.fa"))
+  write_tsv(subtypes[i, 1], file = paste0(sampleName, ".", subtypes$X2[i], ".txt"), col_names = FALSE)
+  write.fasta(sequences = fasta[[subtypes$X2[i]]], names = subtypes$X2[i], file.out = paste0(sampleName, ".", subtypes$X2[i], "_ref.fa"))
 } 
 
 # NB! Dette er spades scaffolds som blir lest?? Blir ikke riktig å splitte slik?
@@ -56,7 +56,7 @@ for (i in 1:length(split)){
   # Subset the scaffolds
   geno_fa <- scaffolds_fa[tmp$X1]
   # Write to file
-  write.fasta(sequences = geno_fa, names = names(geno_fa), file.out = paste0(sampleName, "_", tmp$genotype[1], "_scaffolds.fa"))
+  write.fasta(sequences = geno_fa, names = names(geno_fa), file.out = paste0(sampleName, ".", tmp$genotype[1], "_scaffolds.fa"))
 }
 
 # Write out sessionInfo() to track versions
