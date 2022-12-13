@@ -5,11 +5,11 @@ process BLASTN {
     publishDir "${params.outdir}/5_blast/", mode:'copy', pattern:'*.{out,yml}'
 
     input:
-    tuple val(sampleName), path(scaffolds)
+    tuple val(sampleName), path(scaffolds), path(read1), path(read2)
     path blast_db
 
     output:
-    tuple val(sampleName), path('*blast.out'), path(scaffolds), emit: blastn_out
+    tuple val(sampleName), path('*blast.out'), path(scaffolds), path(read1), path(read2), emit: blastn_out
     path "versions.yml"   
 
     script:
