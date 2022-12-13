@@ -1,37 +1,28 @@
 nextflow.enable.dsl=2
 
-kraken_db = params.kraken_db
-blast_db = params.blast_db
-ref_file = params.reference
-genotypes = params.genotypes
-nf_mod_path = "$baseDir/modules"
 // Kraken viral db built on june 7 2022 downloaded from https://benlangmead.github.io/aws-indexes/k2.
 // Custom set of HCV subtypes added. Same sequences as in HCVgenosubtypes_8.5.19_clean.fa
 
-// Setting default values
-params.skip_assembly = false
-params.map_to_reference = false
-
-include { FASTQC } from "$nf_mod_path/fastqc.nf"
-include { TRIM } from "$nf_mod_path/trim.nf"
-include { FASTQC as FASTQC_TRIM } from "$nf_mod_path/fastqc.nf"
-include { KRAKEN2 } from "$nf_mod_path/kraken2.nf"
-//include { SUBSET_KRAKEN2 } from "$nf_mod_path/subset_kraken2.nf"
-include { REPAIR } from "$nf_mod_path/repair.nf"
-include { SPADES } from "$nf_mod_path/spades.nf"
-include { MULTIQC } from "$nf_mod_path/multiqc.nf"
-include { BLASTN } from "$nf_mod_path/blastn.nf"
-include { BLAST_PARSE } from "$nf_mod_path/blast_parse.nf"
-include { MAP_TO_GENOTYPES } from "$nf_mod_path/map_to_genotypes.nf"
-include { PLOT_COVERAGE } from "$nf_mod_path/plot_coverage.nf"
-include { SUMMARIZE_MAPPING } from "$nf_mod_path/summarize_mapping.nf"
-//include { ABACAS } from "$nf_mod_path/abacas.nf"
-include { INDEX } from "$nf_mod_path/index.nf"
-include { DEDUP } from "$nf_mod_path/dedup.nf"
-include { BOWTIE2 } from "$nf_mod_path/bowtie2.nf"
-include { TANOTI } from "$nf_mod_path/tanoti.nf"
-//include { HCV_GLUE_SQL } from "$nf_mod_path/hcv_glue_sql.nf"
-include { RVA_GENO } from "$nf_mod_path/rva_genotyping.nf"
+include { FASTQC } from "./modules/fastqc.nf"
+include { TRIM } from "./modules/trim.nf"
+include { FASTQC as FASTQC_TRIM } from "./modules/fastqc.nf"
+include { KRAKEN2_FOCUSED } from "./modules/kraken2_focused.nf"
+//include { SUBSET_KRAKEN2 } from "./modules/subset_kraken2.nf"
+include { REPAIR } from "./modules/repair.nf"
+include { SPADES } from "./modules/spades.nf"
+include { MULTIQC } from "./modules/multiqc.nf"
+include { BLASTN } from "./modules/blastn.nf"
+include { BLAST_PARSE } from "./modules/blast_parse.nf"
+include { MAP_TO_GENOTYPES } from "./modules/map_to_genotypes.nf"
+include { PLOT_COVERAGE } from "./modules/plot_coverage.nf"
+include { SUMMARIZE_MAPPING } from "./modules/summarize_mapping.nf"
+//include { ABACAS } from "./modules/abacas.nf"
+include { INDEX } from "./modules/index.nf"
+include { DEDUP } from "./modules/dedup.nf"
+include { BOWTIE2 } from "./modules/bowtie2.nf"
+include { TANOTI } from "./modules/tanoti.nf"
+//include { HCV_GLUE_SQL } from "./modules/hcv_glue_sql.nf"
+include { RVA_GENO } from "./modules/rva_genotyping.nf"
 
 workflow {
   reads = Channel
@@ -42,15 +33,15 @@ workflow {
   FASTQC(reads, 'raw')
   TRIM(reads)
   FASTQC_TRIM(TRIM.out.TRIM_out, 'trimmed')
-  KRAKEN2(TRIM.out.TRIM_out, kraken_db)
+  KRAKEN2(TRIM.out.TRIM_out, params.kraken_db)
 
   // Run Spades if --skip_assembly is not active
   if (!params.skip_assembly) {
     //SUBSET_KRAKEN2(TRIM.out.TRIM_out, KRAKEN2.out.report, KRAKEN2.out.classified_reads_assignment)
     //REPAIR(SUBSET_KRAKEN2.out.subset_reads_fastq)
-    SPADES(KRAKEN2.out.classified_reads_fastq)
-    BLASTN(SPADES.out.scaffolds, blast_db)
-    BLAST_PARSE(BLASTN.out.blastn_out, blast_db)
+    SPADES(KRAKEN2_FOCUSED.out.classified_reads_fastq)
+    BLASTN(SPADES.out.scaffolds, params.blast_db)
+    BLAST_PARSE(BLASTN.out.blastn_out, params.blast_db)
     MAP_TO_GENOTYPES(BLAST_PARSE.out.FOR_MAPPING)
     //ABACAS(BLAST_PARSE.out.subtypes_references, BLAST_PARSE.out.scaffolds_fasta, BLAST_PARSE.out.genotypes)
 
@@ -78,7 +69,7 @@ workflow {
   // Takes FastQC and Kraken output
   FILES_FOR_MULTIQC = FASTQC.out.FASTQC_out.collect { it[1] }.mix(
   FASTQC_TRIM.out.FASTQC_out.collect { it[1] }.mix(
-    KRAKEN2.out.report)
+    KRAKEN2_FOCUSED.out.report)
   ).collect()
   MULTIQC(FILES_FOR_MULTIQC)
 }
