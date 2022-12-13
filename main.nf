@@ -1,11 +1,9 @@
 nextflow.enable.dsl=2
 
-// Kraken viral db built on june 7 2022 downloaded from https://benlangmead.github.io/aws-indexes/k2.
-// Custom set of HCV subtypes added. Same sequences as in HCVgenosubtypes_8.5.19_clean.fa
-
 include { FASTQC } from "./modules/fastqc.nf"
 include { TRIM } from "./modules/trim.nf"
 include { FASTQC as FASTQC_TRIM } from "./modules/fastqc.nf"
+include { KRAKEN2 } from "./modules/kraken2.nf"
 include { KRAKEN2_FOCUSED } from "./modules/kraken2_focused.nf"
 //include { SUBSET_KRAKEN2 } from "./modules/subset_kraken2.nf"
 include { REPAIR } from "./modules/repair.nf"
@@ -33,7 +31,8 @@ workflow {
   FASTQC(reads, 'raw')
   TRIM(reads)
   FASTQC_TRIM(TRIM.out.TRIM_out, 'trimmed')
-  KRAKEN2(TRIM.out.TRIM_out, params.kraken_db)
+  KRAKEN2(TRIM.out.TRIM_out, params.kraken_main)
+  KRAKEN2_FOCUSED(TRIM.out.TRIM_out, params.kraken_db)
 
   // Run Spades if --skip_assembly is not active
   if (!params.skip_assembly) {
