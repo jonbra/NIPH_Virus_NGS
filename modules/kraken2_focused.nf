@@ -12,7 +12,6 @@ process KRAKEN2_FOCUSED {
 
     output:
     tuple val(sampleName), path('*classified_1*'), path('*classified_2*'), emit: classified_reads_fastq
-    path "*classifiedreads*"                                             , emit: classified_reads_assignment
     path "*report.txt"                                                   , emit: report
     path "versions.yml"                                                  , emit: versions
 
@@ -21,10 +20,10 @@ process KRAKEN2_FOCUSED {
     kraken2 \\
         --db $kraken_db \\
         --threads $task.cpus \\
-        --report ${sampleName}.kraken2.report.txt \\
+        --report ${sampleName}.kraken2_focused.report.txt \\
         --paired \\
         --classified-out ${sampleName}.classified#.fastq \\
-        --output ${sampleName}.kraken2.classifiedreads.txt \\
+        --output ${sampleName}.kraken2_focused.classifiedreads.txt \\
         $read1 $read2
 
 
