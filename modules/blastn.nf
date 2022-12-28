@@ -15,9 +15,9 @@ process BLASTN {
     script:
 
     """
-    makeblastdb \\
-        -in $blast_db \\
-        -dbtype nucl
+    #makeblastdb \\
+    #    -in $blast_db \\
+    #    -dbtype nucl
 
     blastn \\
         -db $blast_db \\
