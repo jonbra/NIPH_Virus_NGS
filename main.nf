@@ -27,12 +27,14 @@ workflow {
           .fromPath(params.samplelist)
           .splitCsv(header:true, sep:",")
           .map{ row -> tuple(row.sample, file(row.fastq_1), file(row.fastq_2))}
-  
+  kraken_main = Channel.fromPath( params.kraken_all )
+  kraken_sub = Channel.fromPath( params.kraken_focused )  
+  blast_file = Channel.fromPath( params.blast_db )
   FASTQC(reads, 'raw')
   TRIM(reads)
   FASTQC_TRIM(TRIM.out.TRIM_out, 'trimmed')
-  KRAKEN2(TRIM.out.TRIM_out, params.kraken_main)
-  KRAKEN2_FOCUSED(TRIM.out.TRIM_out, params.kraken_db)
+  //KRAKEN2(TRIM.out.TRIM_out, kraken_main)
+  KRAKEN2_FOCUSED(TRIM.out.TRIM_out, kraken_sub)
 
   // Run Spades if --skip_assembly is not active
   if (!params.skip_assembly) {
@@ -40,7 +42,7 @@ workflow {
     //REPAIR(SUBSET_KRAKEN2.out.subset_reads_fastq)
     SPADES(KRAKEN2_FOCUSED.out.classified_reads_fastq)
     BLASTN(SPADES.out.scaffolds, params.blast_db)
-    BLAST_PARSE(BLASTN.out.blastn_out, params.blast_db)
+    BLAST_PARSE(BLASTN.out.blastn_out, blast_file)
     MAP_TO_GENOTYPES(BLAST_PARSE.out.FOR_MAPPING)
     //ABACAS(BLAST_PARSE.out.subtypes_references, BLAST_PARSE.out.scaffolds_fasta, BLAST_PARSE.out.genotypes)
 
