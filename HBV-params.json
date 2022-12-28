@@ -1,0 +1,13 @@
+{
+    "work_dir": "\/media\/jonr\/SATA6TB1\/work\/",
+    "agens": "HBV",
+    "//agens_comment": "",
+    "samplelist": "1-HBV_Run820_samplesheet.csv",
+    "outdir": "HBV_results",
+    "kraken_all": "\/media\/jonr\/SATA6TB1\/Kraken_db\/", 
+    "//kraken_all_comment": "PlusPFP database compiled by Ben Langmead on 9. December 2022",
+    "kraken_focused": "\/home\/jonr\/Prosjekter\/learning_nextflow\/Data\/Kraken_db\/db_HBV\/",  
+    "//kraken_focused_comment": "NCBI Hepacivirus genomes with HCV genotypes from NCBI added|",
+    "blast_db": "\/home\/jonr\/Prosjekter\/learning_nextflow\/Data\/Blast_db\/2022.12.28-HBV_GLUE_NCBI_0.99.fa", 
+    "//blast_db_comment": "Custom set of HBV fasta files representing different genotypes"
+}
