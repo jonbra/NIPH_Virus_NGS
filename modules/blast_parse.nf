@@ -22,6 +22,7 @@ process BLAST_PARSE {
 
     script:
     """
-    blast_parse.R "$sampleName" "$blast_out" "$scaffolds" "$references"
+    // params.agens comes from the agent-specific config file
+    blast_parse.R "$sampleName" "$blast_out" "$scaffolds" "$references" $params.agens
     """
 }
