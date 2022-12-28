@@ -4,11 +4,11 @@ process KRAKEN2 {
 
     publishDir "${params.outdir}/3_kraken2/", mode:'copy', pattern:'*.{txt,yml}'
 
-    label 'small'
+    label 'medium'
 
     input:
     tuple val(sampleName), path(read1), path(read2)
-    path  kraken_main
+    path kraken_main, stageAs: 'db'
 
     output:
     tuple val(sampleName), path("*report.txt"), emit: report
@@ -17,7 +17,7 @@ process KRAKEN2 {
     script:
     """
     kraken2 \\
-        --db $kraken_main \\
+        --db "db" \\
         --threads $task.cpus \\
         --report ${sampleName}.kraken2.report.txt \\
         --paired \\

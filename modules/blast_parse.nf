@@ -10,7 +10,7 @@ process BLAST_PARSE {
 
     input:
     tuple val(sampleName), path(blast_out), path(scaffolds), path(read1), path(read2)
-    path references
+    val references
 
     output:
     tuple val(sampleName), path('*ref.fa'), path(read1), path(read2), emit: FOR_MAPPING
@@ -22,7 +22,7 @@ process BLAST_PARSE {
 
     script:
     """
-    // params.agens comes from the agent-specific config file
+    # params.agens comes from the agent-specific config file
     blast_parse.R "$sampleName" "$blast_out" "$scaffolds" "$references" $params.agens
     """
 }

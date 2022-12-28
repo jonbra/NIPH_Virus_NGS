@@ -8,7 +8,7 @@ process KRAKEN2_FOCUSED {
 
     input:
     tuple val(sampleName), path(read1), path(read2)
-    path  kraken_db
+    path kraken_db
 
     output:
     tuple val(sampleName), path('*classified_1*'), path('*classified_2*'), emit: classified_reads_fastq

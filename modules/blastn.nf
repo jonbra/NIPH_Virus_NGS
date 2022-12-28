@@ -6,7 +6,7 @@ process BLASTN {
 
     input:
     tuple val(sampleName), path(scaffolds), path(read1), path(read2)
-    path blast_db
+    val blast_db
 
     output:
     tuple val(sampleName), path('*blast.out'), path(scaffolds), path(read1), path(read2), emit: blastn_out
