@@ -34,6 +34,9 @@ if (agens == "HCV") {
     separate(sseqid, into = c("genotype", NA), remove = FALSE) %>% 
     # Count the number of each subject
     add_count(sseqid) 
+  
+  # Write out the reformatted blast result
+  write_csv(scaf %>% select(-n), file = paste0(sampleName, "_blast_out.csv"))
 
   # Which genotypes are present?
   genotypes <- scaf %>% 
