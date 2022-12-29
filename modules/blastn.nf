@@ -6,7 +6,7 @@ process BLASTN {
 
     input:
     tuple val(sampleName), path(scaffolds), path(read1), path(read2)
-    val blast_db
+    path blast_db
 
     output:
     tuple val(sampleName), path('*blast.out'), path(scaffolds), path(read1), path(read2), emit: blastn_out
@@ -15,9 +15,9 @@ process BLASTN {
     script:
 
     """
-    #makeblastdb \\
-    #    -in $blast_db \\
-    #    -dbtype nucl
+    makeblastdb \\
+        -in $blast_db \\
+        -dbtype nucl
 
     blastn \\
         -db $blast_db \\
