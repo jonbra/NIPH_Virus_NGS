@@ -42,7 +42,7 @@ workflow {
     //REPAIR(SUBSET_KRAKEN2.out.subset_reads_fastq)
     SPADES(KRAKEN2_FOCUSED.out.classified_reads_fastq)
     BLASTN(SPADES.out.scaffolds, params.blast_db)
-    BLAST_PARSE(BLASTN.out.blastn_out, blast_file)
+    BLAST_PARSE(BLASTN.out.blastn_out)
     MAP_TO_GENOTYPES(BLAST_PARSE.out.FOR_MAPPING)
     //ABACAS(BLAST_PARSE.out.subtypes_references, BLAST_PARSE.out.scaffolds_fasta, BLAST_PARSE.out.genotypes)
 
