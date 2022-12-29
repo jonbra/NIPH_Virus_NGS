@@ -2,7 +2,7 @@ process BLASTN {
 
     container 'quay.io/biocontainers/blast:2.12.0--pl5262h3289130_0'
 
-    publishDir "${params.outdir}/5_blast/", mode:'copy', pattern:'*.{out,yml}'
+    publishDir "${params.outdir}/5_blast/", mode:'copy', pattern:'*.{yml}'
 
     input:
     tuple val(sampleName), path(scaffolds), path(read1), path(read2)
