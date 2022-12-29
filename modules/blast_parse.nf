@@ -6,7 +6,7 @@ process BLAST_PARSE {
 
     label 'small'
 
-    publishDir "${params.outdir}/5_blast/", mode:'copy', pattern:'*.{tsv,txt,fa}'
+    publishDir "${params.outdir}/5_blast/", mode:'copy', pattern:'*.{csv,tsv,txt,fa}'
 
     input:
     tuple val(sampleName), path(blast_out), path(scaffolds), path(read1), path(read2)
@@ -15,6 +15,7 @@ process BLAST_PARSE {
     output:
     tuple val(sampleName), path('*ref.fa'), path(read1), path(read2), emit: FOR_MAPPING
     //tuple val(sampleName), path('*.txt')  , emit: subtypes
+    tuple val(sampleName), path('*.csv')  , emit: blast_res
     tuple val(sampleName), path('*.tsv')  , emit: genotypes
     path '*ref.fa'                        , emit: subtypes_references
     path '*scaffolds.fa'                  , emit: scaffolds_fasta
