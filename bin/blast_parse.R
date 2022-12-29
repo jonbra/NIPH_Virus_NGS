@@ -76,7 +76,8 @@ if (agens == "HCV") {
     geno_fa <- scaffolds_fa[tmp$qseqid]
     # Write to file
     write.fasta(sequences = geno_fa, names = names(geno_fa), file.out = paste0(sampleName, ".", tmp$genotype[1], "_scaffolds.fa"))
-  }  else if (agens == "HBV") {
+  }
+ }  else if (agens == "HBV") {
   blast_res <- read_tsv(blast_out, col_names = FALSE) %>% 
     # Rename columns
     rename("qseqid" = "X1",
