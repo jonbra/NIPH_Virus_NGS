@@ -48,15 +48,15 @@ if (agens == "HCV") {
   subtypes <- scaf %>% 
     group_by(genotype) %>% 
     slice_max(n, n = 1) %>% 
-    distinct(X2)
+    distinct(sseqid)
 
   # Read the reference fasta file
   fasta <- read.fasta(file = references)
 
   # Write out the name of each subtype
   for (i in 1:nrow(subtypes)) {
-    write_tsv(subtypes[i, 1], file = paste0(sampleName, ".", subtypes$X2[i], ".txt"), col_names = FALSE)
-    write.fasta(sequences = fasta[[subtypes$X2[i]]], names = subtypes$X2[i], file.out = paste0(sampleName, ".", subtypes$X2[i], "_ref.fa"))
+    write_tsv(subtypes[i, 1], file = paste0(sampleName, ".", subtypes$sseqid[i], ".txt"), col_names = FALSE)
+    write.fasta(sequences = fasta[[subtypes$sseqid[i]]], names = subtypes$sseqid[i], file.out = paste0(sampleName, ".", subtypes$sseqid[i], "_ref.fa"))
   } 
 
   # NB! Dette er spades scaffolds som blir lest?? Blir ikke riktig å splitte slik?
@@ -71,9 +71,9 @@ if (agens == "HCV") {
   # Write one fasta per genotype
   for (i in 1:length(split)){
     # Store the scaffold names and corresponding genotype
-    tmp <- split[[i]] %>% select(X1, genotype)
+    tmp <- split[[i]] %>% select(qseqid, genotype)
     # Subset the scaffolds
-    geno_fa <- scaffolds_fa[tmp$X1]
+    geno_fa <- scaffolds_fa[tmp$qseqid]
     # Write to file
     write.fasta(sequences = geno_fa, names = names(geno_fa), file.out = paste0(sampleName, ".", tmp$genotype[1], "_scaffolds.fa"))
   }
