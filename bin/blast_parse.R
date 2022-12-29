@@ -14,7 +14,7 @@ scaffolds  <- args[3]
 references <- args[4]
 agens      <- args[5]
 
-if (agens == "HCV) {
+if (agens == "HCV") {
 
   scaf <- read_tsv(blast_out, col_names = FALSE) %>% 
     # Add a column for the genotype
