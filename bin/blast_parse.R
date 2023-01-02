@@ -14,7 +14,7 @@ scaffolds  <- args[3]
 references <- args[4]
 agens      <- args[5]
 
-if (agens == "HCV") {
+if (agens == "HCV" | agens == "HBV") {
 
   scaf <- read_tsv(blast_out, col_names = FALSE) %>% 
     # Rename columns
@@ -29,12 +29,25 @@ if (agens == "HCV") {
       "sstart" = "X9",
       "send" = "X10",
       "evalue" = "X11",
-      "bitscore" = "X12") %>% 
-    # Add a column for the genotype
-    separate(sseqid, into = c("genotype", NA), remove = FALSE) %>% 
-    # Count the number of each subject
-    add_count(sseqid) 
+      "bitscore" = "X12")
   
+  # Separate the genotype from the subject header
+  # For the HCV references the genotypes are before the accession
+  # For the HBV references the genotypes are after the accession
+  if (agens == "HCV") {
+    # Add a column for the genotype
+    scaf <- scaf %>% 
+      separate(sseqid, into = c("genotype", NA), remove = FALSE) %>% 
+      # Count the number of each subject
+      add_count(sseqid) 
+  } else if (agens == "HBV") {
+    # Add a column for the genotype
+    scaf <- scaf %>% 
+      separate(sseqid, into = c(NA, "genotype"), remove = FALSE) %>% 
+      # Count the number of each subject
+      add_count(sseqid) 
+  }
+
   # Write out the reformatted blast result
   write_csv(scaf %>% select(-n), file = paste0(sampleName, "_blast_out.csv"))
 
@@ -44,7 +57,7 @@ if (agens == "HCV") {
 
   write_tsv(genotypes, paste0(sampleName, ".genotypes.tsv"))
 
-  # What is the most common subtype per genotype?
+  # What is the most common subtype (sseqid) per genotype?
   subtypes <- scaf %>% 
     group_by(genotype) %>% 
     slice_max(n, n = 1) %>% 
@@ -65,6 +78,7 @@ if (agens == "HCV") {
   scaffolds_fa <- read.fasta(file = scaffolds)
 
   # Split scaffolds per genotype
+  # First extract the scaffold names that matches the different genotypes from the blast output
   split <- scaf %>% 
     group_split(genotype)
 
@@ -77,41 +91,7 @@ if (agens == "HCV") {
     # Write to file
     write.fasta(sequences = geno_fa, names = names(geno_fa), file.out = paste0(sampleName, ".", tmp$genotype[1], "_scaffolds.fa"))
   }
- }  else if (agens == "HBV") {
-  blast_res <- read_tsv(blast_out, col_names = FALSE) %>% 
-    # Rename columns
-    rename("qseqid" = "X1",
-           "sseqid" = "X2",
-           "pident" = "X3",
-           "length" = "X4",
-           "mismatch" = "X5",
-           "gapopen" = "X6",
-           "qstart" = "X7",
-           "qend" = "X8",
-           "sstart" = "X9",
-           "send" = "X10",
-           "evalue" = "X11",
-           "bitscore" = "X12") %>% 
-    # Count the number of each Blast subject hit
-    add_count(sseqid) 
-  
-  # Write out the reformatted blast result
-  write_csv(blast_res %>% select(-n), file = paste0(sampleName, "_blast_out.csv"))
-  
-  # Read the reference fasta file
-  fasta <- read.fasta(file = references)
-  
-  # Get a list of names of the blast hits
-  hits <- blast_res %>% 
-    distinct(sseqid)
-  
-  for (i in 1:nrow(hits)) {
-    # Write a file with the name of each blast hit reference
-    write_tsv(hits[i, 1], file = paste0(sampleName, ".", hits$sseqid[i], ".txt"), col_names = FALSE)
-    # Write a fasta file for each blast hit reference
-    write.fasta(sequences = fasta[[hits$sseqid[i]]], names = hits$sseqid[i], file.out = paste0(sampleName, ".", hits$sseqid[i], "_ref.fa"))
-  } 
-}
+ }
 
 # Write out sessionInfo() to track versions
 session <- capture.output(sessionInfo())
