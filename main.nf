@@ -5,7 +5,6 @@ include { TRIM } from "./modules/trim.nf"
 include { FASTQC as FASTQC_TRIM } from "./modules/fastqc.nf"
 include { KRAKEN2 } from "./modules/kraken2.nf"
 include { KRAKEN2_FOCUSED } from "./modules/kraken2_focused.nf"
-//include { SUBSET_KRAKEN2 } from "./modules/subset_kraken2.nf"
 include { REPAIR } from "./modules/repair.nf"
 include { SPADES } from "./modules/spades.nf"
 include { MULTIQC } from "./modules/multiqc.nf"
@@ -14,7 +13,7 @@ include { BLAST_PARSE } from "./modules/blast_parse.nf"
 include { MAP_TO_GENOTYPES } from "./modules/map_to_genotypes.nf"
 include { PLOT_COVERAGE } from "./modules/plot_coverage.nf"
 include { SUMMARIZE_MAPPING } from "./modules/summarize_mapping.nf"
-//include { ABACAS } from "./modules/abacas.nf"
+include { ABACAS } from "./modules/abacas.nf"
 include { INDEX } from "./modules/index.nf"
 include { DEDUP } from "./modules/dedup.nf"
 include { BOWTIE2 } from "./modules/bowtie2.nf"
@@ -27,9 +26,11 @@ workflow {
           .fromPath(params.samplelist)
           .splitCsv(header:true, sep:",")
           .map{ row -> tuple(row.sample, file(row.fastq_1), file(row.fastq_2))}
+
   kraken_main = Channel.fromPath( params.kraken_all )
   kraken_sub = Channel.fromPath( params.kraken_focused )  
   blast_file = Channel.fromPath( params.blast_db )
+
   FASTQC(reads, 'raw')
   TRIM(reads)
   FASTQC_TRIM(TRIM.out.TRIM_out, 'trimmed')
@@ -44,7 +45,7 @@ workflow {
     BLASTN(SPADES.out.scaffolds, params.blast_db)
     BLAST_PARSE(BLASTN.out.blastn_out)
     MAP_TO_GENOTYPES(BLAST_PARSE.out.FOR_MAPPING)
-    //ABACAS(BLAST_PARSE.out.subtypes_references, BLAST_PARSE.out.scaffolds_fasta, BLAST_PARSE.out.genotypes)
+    ABACAS(BLAST_PARSE.out.FOR_ABACAS)
 
     // Plot the coverage of all the genotype mappings
     PLOT_COVERAGE(MAP_TO_GENOTYPES.out.DEPTH.collect())
