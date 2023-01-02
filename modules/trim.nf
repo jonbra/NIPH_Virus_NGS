@@ -10,7 +10,7 @@ process TRIM {
     tuple val(sampleName), path(read1), path(read2)
 
     output:
-    tuple val(sampleName), path ("*trimmed_R1.fastq"), path ("*trimmed_R2.fastq"), emit: TRIM_out
+    tuple val(sampleName), path ("${sampleName}_trimmed_R1.fastq"), path ("${sampleName}_trimmed_R2.fastq"), emit: TRIM_out
 
     script:
     """

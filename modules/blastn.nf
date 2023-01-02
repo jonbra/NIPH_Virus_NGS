@@ -9,7 +9,7 @@ process BLASTN {
     path blast_db
 
     output:
-    tuple val(sampleName), path('*blast.out'), path(scaffolds), path(read1), path(read2), path(blast_db), emit: blastn_out
+    tuple val(sampleName), path("${sampleName}_blast.out"), path(scaffolds), path(read1), path(read2), path(blast_db), emit: blastn_out
     path "versions.yml"   
 
     script:

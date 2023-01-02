@@ -11,7 +11,7 @@ process MAP_TO_GENOTYPES {
     tuple val(sampleName), path(references), path(read1), path(read2)
 
     output:
-    tuple val(sampleName), path('*.bam'), path('*.bai'), emit: BAM
+    tuple val(sampleName), path("${sampleName}*.bam"), path("${sampleName}*.bai"), emit: BAM
     path '*.stats'                                     , emit: STATS
     path '*.gz'                                        , emit: DEPTH
     path '*.yml'

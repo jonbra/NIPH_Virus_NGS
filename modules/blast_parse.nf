@@ -13,8 +13,8 @@ process BLAST_PARSE {
     //val references
 
     output:
-    tuple val(sampleName), path('*ref.fa'), path(read1), path(read2), emit: FOR_MAPPING
-    tuple val(sampleName), path('*ref.fa'), path('*scaffolds.fa')   , emit: FOR_ABACAS
+    tuple val(sampleName), path("${sampleName}*ref.fa"), path(read1), path(read2)          , emit: FOR_MAPPING
+    tuple val(sampleName), path("${sampleName}*ref.fa"), path("${sampleName}*scaffolds.fa"), emit: FOR_ABACAS
     tuple val(sampleName), path('*.csv')  , emit: blast_res
     path 'R_versions.txt'
 
