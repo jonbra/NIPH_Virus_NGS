@@ -1,5 +1,9 @@
 nextflow.enable.dsl=2
 
+kraken_main = params.kraken_all
+kraken_sub = params.kraken_focused
+blast_file = params.blast_db
+
 include { FASTQC } from "./modules/fastqc.nf"
 include { TRIM } from "./modules/trim.nf"
 include { FASTQC as FASTQC_TRIM } from "./modules/fastqc.nf"
@@ -26,10 +30,8 @@ workflow {
           .fromPath(params.samplelist)
           .splitCsv(header:true, sep:",")
           .map{ row -> tuple(row.sample, file(row.fastq_1), file(row.fastq_2))}
-
-  kraken_main = Channel.fromPath( params.kraken_all )
-  kraken_sub = Channel.fromPath( params.kraken_focused )  
-  blast_file = Channel.fromPath( params.blast_db )
+ 
+  //blast_file = Channel.fromPath( params.blast_db )
 
   FASTQC(reads, 'raw')
   TRIM(reads)
