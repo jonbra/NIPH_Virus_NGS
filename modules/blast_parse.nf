@@ -14,11 +14,8 @@ process BLAST_PARSE {
 
     output:
     tuple val(sampleName), path('*ref.fa'), path(read1), path(read2), emit: FOR_MAPPING
-    //tuple val(sampleName), path('*.txt')  , emit: subtypes
+    tuple val(sampleName), path('*ref.fa'), path('*scaffolds.fa')   , emit: FOR_ABACAS
     tuple val(sampleName), path('*.csv')  , emit: blast_res
-    tuple val(sampleName), path('*.tsv')  , emit: genotypes          , optional: true
-    path '*ref.fa'                        , emit: genotypes_references
-    path '*scaffolds.fa'                  , emit: scaffolds_fasta    , optional: true
     path 'R_versions.txt'
 
     script:
