@@ -85,7 +85,10 @@ if (agens == "HCV" | agens == "HBV") {
   # Write one fasta per genotype
   for (i in 1:length(split)){
     # Store the scaffold names and corresponding genotype
-    tmp <- split[[i]] %>% select(qseqid, genotype)
+    tmp <- split[[i]] %>% select(qseqid, genotype) %>% 
+      # If the same scaffold has multiple blast hits to the same reference
+      # it will cover multiple lines
+      distinct()
     # Subset the scaffolds
     geno_fa <- scaffolds_fa[tmp$qseqid]
     # Write to file
