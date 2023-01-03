@@ -1,6 +1,6 @@
 .nextflow*
 work/*
-results/*
+*results*/*
 samplesheets/*
 HCV_results/*
 RVA_results/*
