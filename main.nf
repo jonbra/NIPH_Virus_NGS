@@ -4,8 +4,6 @@ kraken_main = params.kraken_all
 kraken_sub = params.kraken_focused
 blast_file = params.blast_db
 
-reportdir = "${params.outdir}/reports"
-
 include { FASTQC } from "./modules/fastqc.nf"
 include { TRIM } from "./modules/trim.nf"
 include { FASTQC as FASTQC_TRIM } from "./modules/fastqc.nf"
