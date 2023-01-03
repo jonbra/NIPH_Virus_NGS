@@ -4,7 +4,9 @@ process MAP_TO_GENOTYPES {
 
     label 'small'
 
-    publishDir "${params.outdir}/6_map/", mode:'copy', pattern:'*.{bam,bai,yml,stats,log,gz}'
+    publishDir "${params.outdir}/6_map/", mode:'copy', pattern:'*.{bam,bai,stats,gz}'
+    publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
+    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     input:
     // Her kan det være flere ref.fa-filer. Det kan variere
@@ -16,6 +18,7 @@ process MAP_TO_GENOTYPES {
     path '*.gz'                                        , emit: DEPTH
     path '*.yml'
     path '*.log'
+    path '*.sh'
 
     script:
     """
@@ -44,7 +47,10 @@ process MAP_TO_GENOTYPES {
 
     done
 
-    cat <<-END_VERSIONS > versions.yml
+    cp .command.log ${sampleName}.bowtie2_command.log
+    cp .command.sh ${sampleName}.bowtie2_command.sh
+
+    cat <<-END_VERSIONS > bowtie2_versions.yml
     "${task.process}":
         bowtie2: \$(echo \$(bowtie2 --version 2>&1) | sed 's/^.*bowtie2-align-s version //; s/ .*\$//')
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')

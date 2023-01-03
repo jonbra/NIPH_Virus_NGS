@@ -2,7 +2,9 @@ process KRAKEN2_FOCUSED {
 
     container 'quay.io/biocontainers/mulled-v2-5799ab18b5fc681e75923b2450abaa969907ec98:87fc08d11968d081f3e8a37131c1f1f6715b6542-0'
 
-    publishDir "${params.outdir}/3_kraken2/", mode:'copy', pattern:'*.{txt,yml}'
+    publishDir "${params.outdir}/3_kraken2/", mode:'copy', pattern:'*.{txt}'
+    publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
+    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     label 'small'
 
@@ -13,7 +15,7 @@ process KRAKEN2_FOCUSED {
     output:
     tuple val(sampleName), path("${sampleName}.classified_1.fastq"), path("${sampleName}.classified_2.fastq"), emit: classified_reads_fastq
     path "${sampleName}.kraken2_focused.report.txt"                                                          , emit: report
-    path "versions.yml"                                                                                      , emit: versions
+    path "*.{log,sh,yml}"
 
     script:
     """
@@ -26,8 +28,10 @@ process KRAKEN2_FOCUSED {
         --output ${sampleName}.kraken2_focused.classifiedreads.txt \\
         $read1 $read2
 
+    cp .command.log ${sampleName}.kraken2_focused.log
+    cp .command.sh ${sampleName}.kraken2_focused.sh
 
-    cat <<-END_VERSIONS > versions.yml
+    cat <<-END_VERSIONS > kraken2_versions.yml
     "${task.process}":
         kraken2: \$(echo \$(kraken2 --version 2>&1) | sed 's/^.*Kraken version //; s/ .*\$//')
     END_VERSIONS

@@ -10,10 +10,12 @@ process MULTIQC {
     output:
     path '0_multiqc_report.html'
     path '0_multiqc_data'
-    path 'all.multiqc.{log,sh}'
+    path 'multiqc_command.{log,sh}'
+    path 'multiqc_versions.yml'
 
     publishDir "${params.outdir}/6_multiqc/", mode: 'copy', pattern:'*multiqc_*'
-    publishDir "${params.outdir}/6_multiqc/", mode: 'copy', pattern:'*.yml'
+    publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
+    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     script:
     """
@@ -21,10 +23,10 @@ process MULTIQC {
     mv multiqc_data 0_multiqc_data
     mv multiqc_report.html 0_multiqc_report.html
 
-    cp .command.sh all.multiqc.sh
-    cp .command.log all.multiqc.log
+    cp .command.sh multiqc_command.sh
+    cp .command.log multiqc_command.log
 
-    cat <<-END_VERSIONS > versions.yml
+    cat <<-END_VERSIONS > multiqc_versions.yml
     "${task.process}":
         multiqc: \$( multiqc --version | sed -e "s/multiqc, version //g" )
     END_VERSIONS

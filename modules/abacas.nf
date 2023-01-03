@@ -4,14 +4,17 @@ process ABACAS {
     
     errorStrategy 'ignore'
 
-    publishDir "${params.outdir}/6_abacas/", mode:'copy', pattern:'*'
+    publishDir "${params.outdir}/6_abacas/", mode:'copy', pattern:'*{delta,tiling,out,bin,crunch,fasta,gaps,tab,fa}'
+    publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
+    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     input:
     tuple val(sampleName), path(references), path(scaffolds)
 
     output:
     tuple val(sampleName), path('*.abacas*'), emit: abacas_results
-    path "versions.yml"                     , emit: versions
+    path "abacas_versions.yml"
+    path "*.{log,sh}"
 
     when:
     task.ext.when == null || task.ext.when
@@ -45,7 +48,10 @@ process ABACAS {
         mv unused_contigs.out ${sampleName}.abacas.unused.contigs.out
     done
 
-    cat <<-END_VERSIONS > versions.yml
+    cp .command.log ${sampleName}.abacas_command.log
+    cp .command.sh ${sampleName}.abacas_command.sh
+
+    cat <<-END_VERSIONS > abacas_versions.yml
     "${task.process}":
         abacas: \$(echo \$(abacas.pl -v 2>&1) | sed 's/^.*ABACAS.//; s/ .*\$//')
     END_VERSIONS

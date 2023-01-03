@@ -2,7 +2,9 @@ process TRIM {
   
     container 'quay.io/biocontainers/cutadapt:3.7--py37h8902056_1'
 
-    publishDir "${params.outdir}/2_trimmed", mode:'copy', pattern:'*.{fastq,sh,log,yml}'
+    publishDir "${params.outdir}/2_trimmed", mode:'copy', pattern:'*.{fastq}'
+    publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
+    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     label 'small'
 
@@ -11,6 +13,7 @@ process TRIM {
 
     output:
     tuple val(sampleName), path ("${sampleName}_trimmed_R1.fastq"), path ("${sampleName}_trimmed_R2.fastq"), emit: TRIM_out
+    path "*.{log,sh,yml}"
 
     script:
     """
@@ -19,7 +22,7 @@ process TRIM {
     cp .command.log ${sampleName}.cutadapt.log
     cp .command.sh ${sampleName}.cutadapt.sh
 
-    cat <<-END_VERSIONS > versions.yml
+    cat <<-END_VERSIONS > cutadapt_versions.yml
     "${task.process}":
         cutadapt: \$(cutadapt --version)
     END_VERSIONS
