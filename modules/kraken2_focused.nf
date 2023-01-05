@@ -14,7 +14,7 @@ process KRAKEN2_FOCUSED {
 
     output:
     tuple val(sampleName), path("${sampleName}.classified_1.fastq"), path("${sampleName}.classified_2.fastq"), emit: classified_reads_fastq
-    path "${sampleName}.kraken2_focused.report.txt"                                                          , emit: report
+    tuple val(sampleName), path("${sampleName}.kraken2_focused.report.txt")                                  , emit: report
     path "*.{log,sh,yml}"
 
     script:

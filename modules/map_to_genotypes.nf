@@ -14,8 +14,9 @@ process MAP_TO_GENOTYPES {
 
     output:
     tuple val(sampleName), path("${sampleName}*.bam"), path("${sampleName}*.bai"), emit: BAM
-    path '*.stats'                                     , emit: STATS
-    path '*.gz'                                        , emit: DEPTH
+    tuple val(sampleName), path("*.flagstat")                                    , emit: flagstat
+    path '*.stats'                                                               , emit: STATS
+    path '*.gz'                                                                  , emit: DEPTH
     path '*.yml'
     path '*.log'
     path '*.sh'
@@ -41,6 +42,8 @@ process MAP_TO_GENOTYPES {
     samtools index ${sampleName}.\$i.sorted.bam
 
     samtools stats ${sampleName}.\$i.sorted.bam | grep ^SN | cut -f 2- > ${sampleName}.\$i.sorted.bam.stats
+
+    samtools flagstat ${sampleName}.\$i.sorted.bam > ${sampleName}.\$i.sorted.flagstat
 
     # Creating file with coverage per site for plotting later
     samtools depth -aa -d 1000000 ${sampleName}.\$i.sorted.bam | gzip > ${sampleName}.\$i.sorted.bam_coverage.txt.gz
