@@ -68,12 +68,55 @@ workflow {
   }
 
   //HCV_GLUE_SQL(SPADES.out.scaffolds)
-
+  
+  //
   // MultiQC
-  // Takes FastQC and Kraken output
-  FILES_FOR_MULTIQC = FASTQC.out.FASTQC_out.collect { it[1] }.mix(
-  FASTQC_TRIM.out.FASTQC_out.collect { it[1] }.mix(
-    KRAKEN2_FOCUSED.out.report)
-  ).collect()
-  MULTIQC(FILES_FOR_MULTIQC)
-}
+  //
+MULTIQC(
+  TRIM.out.log.collect{it[1]}.ifEmpty([]),
+  KRAKEN2_FOCUSED.out.report.collect{it[1]}.ifEmpty([]),
+  FASTQC.out.FASTQC_out.collect{it[1]}.ifEmpty([]),
+  FASTQC_TRIM.out.FASTQC_out.collect{it[1]}.ifEmpty([]),
+  MAP_TO_GENOTYPES.out.flagstat.collect{it[1]}.ifEmpty([])
+)
+
+}/*
+
+
+    //
+    // MODULE: MultiQC
+    //
+    if (!params.skip_multiqc) {
+        workflow_summary    = WorkflowCommons.paramsSummaryMultiqc(workflow, summary_params)
+        ch_workflow_summary = Channel.value(workflow_summary)
+
+        MULTIQC (
+            ch_multiqc_config,
+            ch_multiqc_custom_config,
+            CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
+            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
+            ch_fail_reads_multiqc.ifEmpty([]),
+            ch_fail_mapping_multiqc.ifEmpty([]),
+            ch_amplicon_heatmap_multiqc.ifEmpty([]),
+            FASTQC_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([]),
+            FASTQC_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]),
+            ch_kraken2_multiqc.collect{it[1]}.ifEmpty([]),
+            ch_bowtie2_flagstat_multiqc.collect{it[1]}.ifEmpty([]),
+            ch_bowtie2_multiqc.collect{it[1]}.ifEmpty([]),
+            ch_ivar_trim_flagstat_multiqc.collect{it[1]}.ifEmpty([]),
+            ch_markduplicates_flagstat_multiqc.collect{it[1]}.ifEmpty([]),
+            ch_mosdepth_multiqc.collect{it[1]}.ifEmpty([]),
+            ch_ivar_counts_multiqc.collect{it[1]}.ifEmpty([]),
+            ch_bcftools_stats_multiqc.collect{it[1]}.ifEmpty([]),
+            ch_snpeff_multiqc.collect{it[1]}.ifEmpty([]),
+            ch_quast_multiqc.collect().ifEmpty([]),
+            ch_pangolin_multiqc.collect{it[1]}.ifEmpty([]),
+            ch_nextclade_multiqc.collect().ifEmpty([]),
+            ch_cutadapt_multiqc.collect{it[1]}.ifEmpty([]),
+            ch_spades_quast_multiqc.collect().ifEmpty([]),
+            ch_unicycler_quast_multiqc.collect().ifEmpty([]),
+            ch_minia_quast_multiqc.collect().ifEmpty([])
+        )
+        multiqc_report = MULTIQC.out.report.toList()
+    }
+    */
