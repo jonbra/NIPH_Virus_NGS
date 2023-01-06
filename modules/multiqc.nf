@@ -5,10 +5,12 @@ process MULTIQC {
     label 'small'
 
     input:
+    path 'multiqc_config.yaml'
+    path ('fastqc_raw/*')
     path ('cutadapt/*')
-    path ('kraken2/*')
-    path ('fastqc/*')
-    path ('fastqc/*')
+    path ('kraken2_all/*')
+    path ('kraken2_subset/*')
+    path ('fastqc_trimmed/*')
     path ('bowtie2/*')
     //path ('assembly_spades/*')
 
@@ -24,7 +26,7 @@ process MULTIQC {
 
     script:
     """
-    multiqc .
+    multiqc . 
     mv multiqc_data 0_multiqc_data
     mv multiqc_report.html 0_multiqc_report.html
 
