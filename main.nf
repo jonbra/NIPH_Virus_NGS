@@ -1,9 +1,5 @@
 nextflow.enable.dsl=2
 
-kraken_main = params.kraken_all
-kraken_sub = params.kraken_focused
-blast_file = params.blast_db
-
 include { FASTQC } from "./modules/fastqc.nf"
 include { TRIM } from "./modules/trim.nf"
 include { FASTQC as FASTQC_TRIM } from "./modules/fastqc.nf"
@@ -36,8 +32,8 @@ workflow {
   FASTQC(reads, 'raw')
   TRIM(reads)
   FASTQC_TRIM(TRIM.out.TRIM_out, 'trimmed')
-  //KRAKEN2(TRIM.out.TRIM_out, kraken_main)
-  KRAKEN2_FOCUSED(TRIM.out.TRIM_out, kraken_sub)
+  KRAKEN2(TRIM.out.TRIM_out, params.kraken_all)
+  KRAKEN2_FOCUSED(TRIM.out.TRIM_out, params.kraken_focused)
 
   // Run Spades if --skip_assembly is not active
   if (!params.skip_assembly) {
@@ -73,9 +69,11 @@ workflow {
   // MultiQC
   //
 MULTIQC(
-  TRIM.out.log.collect{it[1]}.ifEmpty([]),
-  KRAKEN2_FOCUSED.out.report.collect{it[1]}.ifEmpty([]),
+  params.multiqc_config,
   FASTQC.out.FASTQC_out.collect{it[1]}.ifEmpty([]),
+  TRIM.out.log.collect{it[1]}.ifEmpty([]),
+  KRAKEN2.out.report.collect{it[1]}.ifEmpty([]),
+  KRAKEN2_FOCUSED.out.report.collect{it[1]}.ifEmpty([]),
   FASTQC_TRIM.out.FASTQC_out.collect{it[1]}.ifEmpty([]),
   MAP_TO_GENOTYPES.out.flagstat.collect{it[1]}.ifEmpty([])
 )
