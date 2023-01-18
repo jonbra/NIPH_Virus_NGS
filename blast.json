@@ -1,0 +1,159 @@
+{
+"BlastOutput2": [
+{
+    "report": {
+      "program": "blastx",
+      "version": "BLASTX 2.9.0+",
+      "reference": "Stephen F. Altschul, Thomas L. Madden, Alejandro A. Sch&auml;ffer, Jinghui Zhang, Zheng Zhang, Webb Miller, and David J. Lipman (1997), \"Gapped BLAST and PSI-BLAST: a new generation of protein database search programs\", Nucleic Acids Res. 25:3389-3402.",
+      "search_target": {
+        "subjects": [
+          "Subject_1"
+        ]
+      },
+      "params": {
+        "matrix": "BLOSUM62",
+        "expect": 10,
+        "gap_open": 11,
+        "gap_extend": 1,
+        "filter": "L;",
+        "cbs": 2,
+        "query_gencode": 1
+      },
+      "results": {
+        "bl2seq": [
+          {
+            "query_id": "Query_1",
+            "query_title": "NODE_1_length_3470_cov_795.119055",
+            "query_len": 3470,
+            "query_masking": [
+              {
+                "from": 60,
+                "to": 87
+              },
+              {
+                "from": 198,
+                "to": 219
+              },
+              {
+                "from": 396,
+                "to": 426
+              },
+              {
+                "from": 609,
+                "to": 666
+              },
+              {
+                "from": 810,
+                "to": 840
+              },
+              {
+                "from": 1938,
+                "to": 1974
+              },
+              {
+                "from": 2010,
+                "to": 2052
+              },
+              {
+                "from": 2457,
+                "to": 2484
+              },
+              {
+                "from": 2583,
+                "to": 2622
+              },
+              {
+                "from": 838,
+                "to": 907
+              },
+              {
+                "from": 1939,
+                "to": 1972
+              },
+              {
+                "from": 2545,
+                "to": 2593
+              },
+              {
+                "from": 3151,
+                "to": 3250
+              },
+              {
+                "from": 17,
+                "to": 35
+              },
+              {
+                "from": 395,
+                "to": 428
+              },
+              {
+                "from": 614,
+                "to": 662
+              },
+              {
+                "from": 1934,
+                "to": 1976
+              },
+              {
+                "from": 2450,
+                "to": 2483
+              },
+              {
+                "from": 3146,
+                "to": 3227
+              },
+              {
+                "from": 3275,
+                "to": 3302
+              },
+              {
+                "from": 3413,
+                "to": 3434
+              }
+            ],
+            "hits": [
+              {
+                "num": 1,
+                "description": [
+                  {
+                    "id": "RT_domain",
+                    "title": "RT_domain DPOL_HBVD1. Polymerase/reverse transcriptase domain (RT)"
+                  }
+                ],
+                "len": 344,
+                "hsps": [
+                  {
+                    "num": 1,
+                    "bit_score": 593.578,
+                    "score": 1529,
+                    "evalue": 0,
+                    "identity": 317,
+                    "positive": 333,
+                    "query_from": 1213,
+                    "query_to": 2244,
+                    "query_frame": -3,
+                    "hit_from": 1,
+                    "hit_to": 344,
+                    "align_len": 344,
+                    "gaps": 0,
+                    "qseq": "EDWGPCTEYGEHHIRIPRTPARVTGGVFLVDKNPHNTTESRLVVDFSQFSRGSTHVSWPKFAVPnlqsltnllssnlswlsLDVSAAFYhlplhpaamphlLVGSSGLSRYVARLSSTSRNINYQHGTMQDLHDSCSRNLYVSLLLLYKTFGRKLHLYSHPIILGFRKIPMGVGLSPFLLAQFTSAICSVVRRAFPHCLAFSYMDDVVLGAKSVQHLESLYTAITNFLVSLGIHLNPNKTKRWGYSLNFMGYIIGSWGTLPQEHIVQKIKQCFRKLPINRPIDWKVCQRIVGLLGFAAPFTQCGYPALMPLYACIQAKQAFTFSPTYKAFLCKQYLNLYPVARQ",
+                    "hseq": "EDWGPCAEHGEHHIRIPRTPARVTGGVFLVDKNPHNTAESRLVVDFSQFSRGNYRVSWPKFAVPNLQSLTNLLSSNLSWLSLDVSAAFYHLPLHPAAMPHLLVGSSGLSRYVARLSSNSRIINHQHGILQNLHDSCSRNLYVSLLLLYKTFGWKLHLYSHPIILGFRKIPMGVGLSPFLLAQFTSAICSVVRRAFPHCLAFSYMDDVVLGAKSVQHLESLFTAVTNFLLSLGIHLNPNKTKRWGYSLNFMGYVIGCWGSLPQDHIIHKIKECFRKLPVHRPIDWKVCQRIVGLLGFAAPFTQCGYPALMPLYACIQSKQAFTFSPTYKAFLCKQYLNLYPVAEQ",
+                    "midline": "EDWGPC E+GEHHIRIPRTPARVTGGVFLVDKNPHNT ESRLVVDFSQFSRG+  VSWPKFAVPNLQSLTNLLSSNLSWLSLDVSAAFYHLPLHPAAMPHLLVGSSGLSRYVARLSS SR IN+QHG +Q+LHDSCSRNLYVSLLLLYKTFG KLHLYSHPIILGFRKIPMGVGLSPFLLAQFTSAICSVVRRAFPHCLAFSYMDDVVLGAKSVQHLESL+TA+TNFL+SLGIHLNPNKTKRWGYSLNFMGY+IG WG+LPQ+HI+ KIK+CFRKLP++RPIDWKVCQRIVGLLGFAAPFTQCGYPALMPLYACIQ+KQAFTFSPTYKAFLCKQYLNLYPVA Q"
+                  }
+                ]
+              }
+            ],
+            "stat": {
+              "hsp_len": 37,
+              "eff_space": 343533,
+              "kappa": 0.041,
+              "lambda": 0.267,
+              "entropy": 0.14
+            }
+          }
+        ]
+      }
+    }
+  }
+]
+}
