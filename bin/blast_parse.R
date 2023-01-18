@@ -14,6 +14,14 @@ scaffolds  <- args[3]
 references <- args[4]
 agens      <- args[5]
 
+# Read the reference fasta file
+fasta <- read.fasta(file = references)
+
+# NB! Dette er spades scaffolds som blir lest?? Blir ikke riktig å splitte slik?
+# Split scaffolds per subtype
+# Read scaffolds fasta
+scaffolds_fa <- read.fasta(file = scaffolds)
+
 if (agens == "HCV" | agens == "HBV") {
 
   scaf <- read_tsv(blast_out, col_names = FALSE) %>% 
@@ -37,19 +45,15 @@ if (agens == "HCV" | agens == "HBV") {
   if (agens == "HCV") {
     # Add a column for the genotype
     scaf <- scaf %>% 
-      separate(sseqid, into = c("genotype", NA), remove = FALSE) %>% 
-      # Count the number of each subject
-      add_count(sseqid) 
+      separate(sseqid, into = c("genotype", NA), remove = FALSE) 
   } else if (agens == "HBV") {
     # Add a column for the genotype
     scaf <- scaf %>% 
-      separate(sseqid, into = c(NA, "genotype"), remove = FALSE) %>% 
-      # Count the number of each subject
-      add_count(sseqid) 
+      separate(sseqid, into = c(NA, "genotype"), remove = FALSE)
   }
 
   # Write out the reformatted blast result
-  write_csv(scaf %>% select(-n), file = paste0(sampleName, "_blast_out.csv"))
+  write_csv(scaf, file = paste0(sampleName, "_blast_out.csv"))
 
   # Which genotypes are present?
   genotypes <- scaf %>% 
@@ -57,25 +61,21 @@ if (agens == "HCV" | agens == "HBV") {
 
   write_tsv(genotypes, paste0(sampleName, ".genotypes.tsv"))
 
-  # What is the most common subtype (sseqid) per genotype?
-  subtypes <- scaf %>% 
+  # What is the most common reference sequence (sseqid) per genotype?
+  # Need to choose when two or more subtypes are equally frequent. Choose the one hit by the longest scaffold
+  ref_info <- scaf %>%
+    # Get scaffold length info
+    separate(qseqid, c(NA, NA, NA, "sc_length", NA, NA), sep = "_", remove = FALSE) %>% 
+    mutate(sc_length = as.numeric(sc_length)) %>% 
+    # Select the row with the longest scaffold lengths for each genotype/blast hit
     group_by(genotype) %>% 
-    slice_max(n, n = 1) %>% 
-    distinct(sseqid)
+    slice_max(order_by = sc_length, n = 1)
 
-  # Read the reference fasta file
-  fasta <- read.fasta(file = references)
-
-  # Write out the name of each subtype
-  for (i in 1:nrow(subtypes)) {
-    write_tsv(subtypes[i, 1], file = paste0(sampleName, ".", subtypes$sseqid[i], ".txt"), col_names = FALSE)
-    write.fasta(sequences = fasta[[subtypes$sseqid[i]]], names = subtypes$sseqid[i], file.out = paste0(sampleName, ".", subtypes$sseqid[i], "_ref.fa"))
-  } 
-
-  # NB! Dette er spades scaffolds som blir lest?? Blir ikke riktig å splitte slik?
-  # Split scaffolds per subtype
-  # Read scaffolds fasta
-  scaffolds_fa <- read.fasta(file = scaffolds)
+  # Write out a fasta file for the reference file of each genotype
+  for (i in 1:nrow(ref_info)) {
+    #write_tsv(subtypes[i, 1], file = paste0(sampleName, ".", subtypes$sseqid[i], ".txt"), col_names = FALSE)
+    write.fasta(sequences = fasta[[ref_info$sseqid[i]]], names = ref_info$sseqid[i], file.out = paste0(sampleName, ".", ref_info$sseqid[i], "_ref.fa"))
+  }
 
   # Split scaffolds per genotype
   # First extract the scaffold names that matches the different genotypes from the blast output
