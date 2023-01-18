@@ -15,10 +15,73 @@
 # Translatere referansen fra begynnelsen. Da vil jeg få aminosyreendringer, men ikke se dem på nucleotidnivå...
 
 library(tidyverse)
+library(jsonlite)
+library(rjson)
+#library(xml2)
 library(seqinr)
-library(GenomicAlignments)
-library(msa)
-library(rphast)
+#library(GenomicAlignments)
+#library(msa)
+#library(rphast)
+
+rtDomain <- args[1]
+blast    <- args[2]
+              
+# First create a vector of the reference sequence with each amino acid as an element
+rtDomain_seq <- unlist(
+  # split the sequence between every character and convert to a matrix
+  str_split(
+    read.fasta(rtDomain, seqtype = "AA", as.string = TRUE)$RT_domain[1],
+    pattern = "",
+    simplify = TRUE
+    )
+  )
+
+# Read pairwise alignment from blastx
+blast_json <- jsonlite::fromJSON("/home/jonr/Prosjekter/learning_nextflow/blast.json")
+# Get the hsps and convert to tibble
+query_aligned_seq <- unlist(
+  str_split(
+    # Extract the query hsp
+    blast_json[["BlastOutput2"]][["report"]][["results"]][["bl2seq"]][[1]][["hits"]][[1]][["hsps"]][[1]][["qseq"]],
+    pattern = "",
+    simplify = TRUE
+  )
+)
+
+# Find the differences between the aligned sequence and the reference
+tmp <- as_tibble(rtDomain_seq) %>% 
+  pivot_longer(everything()) %>% 
+  mutate("position" = str_remove(name, "V")) %>% 
+  rename("ref_aa" = "value") %>% 
+  select(position, ref_aa)
+
+tmp2 <- as_tibble(query_aligned_seq) %>% 
+  pivot_longer(everything()) %>% 
+  mutate("position" = str_remove(name, "V")) %>% 
+  rename("sample_aa" = "value") %>% 
+  select(position, sample_aa) %>% 
+  # Convert everything to upper characters
+  mutate(sample_aa = toupper(sample_aa))
+
+# join the two and create mutations
+df <- left_join(tmp, tmp2) %>% 
+  # Create a column indicating when the reference and the sample is not identical
+  mutate(mut = case_when(
+    ref_aa != sample_aa ~ "mutated"
+  )) %>% 
+  filter(mut == "mutated") %>% 
+  # Create the mutation names
+  unite("Mutation", c(ref_aa, position, sample_aa), remove = FALSE, sep = "") %>% 
+  select(-mut)
+
+
+# Where are the differences
+rtDomain_seq == query_aligned_seq
+# Extract the differences
+rtDomain_seq[rtDomain_seq != query_aligned_seq]
+query_aligned_seq[query_aligned_seq == rtDomain_seq]
+setdiff(rtDomain_seq, query_aligned_seq)
+identical(rtDomain_seq, query_aligned_seq)
 
 algorithm <- "Muscle"
 
