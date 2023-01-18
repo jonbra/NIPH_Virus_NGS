@@ -13,10 +13,11 @@ process MAP_TO_GENOTYPES {
     tuple val(sampleName), path(references), path(read1), path(read2)
 
     output:
-    tuple val(sampleName), path("${sampleName}*.bam"), path("${sampleName}*.bai"), emit: BAM
-    tuple val(sampleName), path("*.flagstat")                                    , emit: flagstat
-    path '*.stats'                                                               , emit: STATS
-    path '*.gz'                                                                  , emit: DEPTH
+    tuple val(sampleName), path("${sampleName}*nodups.bam"), path("${sampleName}*nodups.bam.bai"), emit: BAM
+    tuple val(sampleName), path("*.withdups.flagstat")                                           , emit: flagstat_dups
+    tuple val(sampleName), path("*.nodups.flagstat")                                             , emit: flagstat_nodups
+    path '*.stats'                                                                               , emit: STATS
+    path '*.gz'                                                                                  , emit: DEPTH
     path '*.yml'
     path '*.log'
     path '*.sh'
@@ -41,12 +42,22 @@ process MAP_TO_GENOTYPES {
 
     samtools index ${sampleName}.\$i.sorted.bam
 
-    samtools stats ${sampleName}.\$i.sorted.bam | grep ^SN | cut -f 2- > ${sampleName}.\$i.sorted.bam.stats
+    # Create stats before removing duplicates
+    samtools flagstat ${sampleName}.\$i.sorted.bam > ${sampleName}.\$i.sorted.withdups.flagstat
 
-    samtools flagstat ${sampleName}.\$i.sorted.bam > ${sampleName}.\$i.sorted.flagstat
+    # Remove duplicates
+    samtools sort -n ${sampleName}.\$i.sorted.bam > ${sampleName}.\$i.sorted.byQuery.bam 
+	samtools fixmate -m ${sampleName}.\$i.sorted.byQuery.bam ${sampleName}.\$i.sorted.byQuery.fix.bam
+    samtools sort ${sampleName}.\$i.sorted.byQuery.fix.bam > ${sampleName}.\$i.sorted.byQuery.fix.sorted.bam
+    samtools markdup -r ${sampleName}.\$i.sorted.byQuery.fix.sorted.bam ${sampleName}.\$i.sorted.nodups.bam
+    samtools index ${sampleName}.\$i.sorted.nodups.bam
+
+    # Create stats after removing duplicates
+    samtools stats ${sampleName}.\$i.sorted.nodups.bam | grep ^SN | cut -f 2- > ${sampleName}.\$i.sorted.nodups.bam.stats
+    samtools flagstat ${sampleName}.\$i.sorted.nodups.bam > ${sampleName}.\$i.sorted.nodups.flagstat
 
     # Creating file with coverage per site for plotting later
-    samtools depth -aa -d 1000000 ${sampleName}.\$i.sorted.bam | gzip > ${sampleName}.\$i.sorted.bam_coverage.txt.gz
+    samtools depth -aa -d 1000000 ${sampleName}.\$i.sorted.nodups.bam | gzip > ${sampleName}.\$i.sorted.nodups.bam_coverage.txt.gz
 
     done
 
