@@ -2,9 +2,10 @@
 
 library(tidyverse)
 
-args = commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 
-folder <- args[1] # "/mnt/N/NGS/3-Sekvenseringsbiblioteker/2022/Illumina_RunXXX/Run820_Virus/Run820/"
+folder  <- args[1] # "/mnt/N/NGS/3-Sekvenseringsbiblioteker/2022/Illumina_RunXXX/Run820_Virus/Run820/"
+outfile <- args[2] # "2023.01.19-HCV_Run829.csv"
 
 # Get the fastq files
 fastq <- list.files(folder,
@@ -18,12 +19,12 @@ R2 <- sort(fastq[grep("R2", fastq)])
 df <- as_tibble(cbind(R1, R2))
 
 # Check that the R1 and R2 files are correctly paired
-tmp <- df %>% 
+tmp <- df %>%
   mutate(tmpR1 = gsub("_.*", "", basename(R1)),
-         tmpR2 = gsub("_.*", "", basename(R2))) %>% 
+         tmpR2 = gsub("_.*", "", basename(R2))) %>%
   select(tmpR1, tmpR2)
 
-if (identical(tmp$tmpR1, tmp$tmpR2)){
+if (identical(tmp$tmpR1, tmp$tmpR2)) {
   df <- df %>%
     mutate(sample_id = gsub("_.*", "", basename(R1))) %>%
     select("sample" = sample_id,
@@ -33,4 +34,4 @@ if (identical(tmp$tmpR1, tmp$tmpR2)){
   print("R1 and R2 files not correctly paired")
 }
 
-write_csv(df, "/home/jonr/Prosjekter/learning_nextflow/HBV_Run820_samplesheet.csv")
+write_csv(df, outfile)
