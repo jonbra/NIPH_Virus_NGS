@@ -9,7 +9,7 @@ process ABACAS {
     publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     input:
-    tuple val(sampleName), path(references), path(scaffolds)
+    tuple val(sampleName), path(reference), path(scaffolds)
 
     output:
     tuple val(sampleName), path('*.abacas*'), emit: abacas_results
@@ -31,9 +31,9 @@ process ABACAS {
         # Extract the first field (samplename) when cut on dot
         # SAMPLE=\$(echo \$i | cut -d',' -f 1)
         # Pull out the reference
-        REF=\$(ls *\${GENO}_ref.fa)
+        REF=\$(ls *\${GENO}*_ref.fa)
         # Pull out the corresponding scaffolds
-        SCAF=\$(ls *\${GENO}_scaffolds.fa)
+        SCAF=\$(ls *\${GENO}*_scaffolds.fa)
 
         # Run ABACAS
         abacas.pl \\
