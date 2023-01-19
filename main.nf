@@ -18,10 +18,10 @@ include { INDEX } from "./modules/index.nf"
 include { DEDUP } from "./modules/dedup.nf"
 include { BOWTIE2 } from "./modules/bowtie2.nf"
 include { TANOTI } from "./modules/tanoti.nf"
-//include { HCV_GLUE_SQL } from "./modules/hcv_glue_sql.nf"
+include { HCV_GLUE_SQL } from "./modules/hcv_glue_sql.nf"
 include { RVA_GENO } from "./modules/rva_genotyping.nf"
-include { HBV_RT_BLAST } from "./modules/hbv_rt_blast.nf"
-include { HBV_RT_BLAST_PARSE } from "./modules/hbv_rt_blast_parse.nf"
+//include { HBV_RT_BLAST } from "./modules/hbv_rt_blast.nf"
+//include { HBV_RT_BLAST_PARSE } from "./modules/hbv_rt_blast_parse.nf"
 
 workflow {
   reads = Channel
@@ -37,22 +37,19 @@ workflow {
   KRAKEN2(TRIM.out.TRIM_out, params.kraken_all)
   KRAKEN2_FOCUSED(TRIM.out.TRIM_out, params.kraken_focused)
 
-  // Run Spades if --skip_assembly is not active
-  if (!params.skip_assembly) {
-    //SUBSET_KRAKEN2(TRIM.out.TRIM_out, KRAKEN2.out.report, KRAKEN2.out.classified_reads_assignment)
-    //REPAIR(SUBSET_KRAKEN2.out.subset_reads_fastq)
-    SPADES(KRAKEN2_FOCUSED.out.classified_reads_fastq)
-    BLASTN(SPADES.out.scaffolds, params.blast_db)
-    BLAST_PARSE(BLASTN.out.blastn_out)
-    MAP_TO_GENOTYPES(BLAST_PARSE.out.FOR_MAPPING)
-    ABACAS(BLAST_PARSE.out.FOR_ABACAS)
+  //SUBSET_KRAKEN2(TRIM.out.TRIM_out, KRAKEN2.out.report, KRAKEN2.out.classified_reads_assignment)
+  //REPAIR(SUBSET_KRAKEN2.out.subset_reads_fastq)
+  SPADES(KRAKEN2_FOCUSED.out.classified_reads_fastq)
+  BLASTN(SPADES.out.scaffolds, params.blast_db)
+  BLAST_PARSE(BLASTN.out.blastn_out)
+  MAP_TO_GENOTYPES(BLAST_PARSE.out.FOR_MAPPING)
+  ABACAS(BLAST_PARSE.out.FOR_ABACAS)
 
-    // Plot the coverage of all the genotype mappings
-    PLOT_COVERAGE(MAP_TO_GENOTYPES.out.DEPTH.collect())
+  // Plot the coverage of all the genotype mappings
+  PLOT_COVERAGE(MAP_TO_GENOTYPES.out.DEPTH.collect())
 
-    // Summarize the mapping statistics for all samples
-    SUMMARIZE_MAPPING(MAP_TO_GENOTYPES.out.STATS.collect())
-  }
+  // Summarize the mapping statistics for all samples
+  SUMMARIZE_MAPPING(MAP_TO_GENOTYPES.out.STATS.collect())
 
   // Run Genotyping for HBV
   if (params.agens == 'HBV') {
@@ -71,7 +68,7 @@ workflow {
     RVA_GENO(SPADES.out.scaffolds, genotypes)
   }
 
-  //HCV_GLUE_SQL(SPADES.out.scaffolds)
+  //HCV_GLUE_SQL(MAP_TO_GENOTYPES.out.BAM)
   
   //
   // MultiQC
@@ -83,7 +80,8 @@ MULTIQC(
   KRAKEN2.out.report.collect{it[1]}.ifEmpty([]),
   KRAKEN2_FOCUSED.out.report.collect{it[1]}.ifEmpty([]),
   FASTQC_TRIM.out.FASTQC_out.collect{it[1]}.ifEmpty([]),
-  MAP_TO_GENOTYPES.out.flagstat.collect{it[1]}.ifEmpty([])
+  MAP_TO_GENOTYPES.out.flagstat_dups.collect{it[1]}.ifEmpty([]),
+  MAP_TO_GENOTYPES.out.flagstat_nodups.collect{it[1]}.ifEmpty([])
 )
 
 }/*
