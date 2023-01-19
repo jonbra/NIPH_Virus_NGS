@@ -2,12 +2,14 @@
     "agens": "HBV",
     "//agens_comment": "",
     "samplelist": "samplesheets/1-HBV_Run820_samplesheet.csv",
-    "outdir": "HBV_metaviral",
-    "spades_mode": "metaviral",
+    "outdir": "HBV_rnaviral",
+    "spades_mode": "rnaviral",
     "kraken_all": "\/media\/jonr\/SATA6TB1\/Kraken_db\/", 
     "//kraken_all_comment": "PlusPFP database compiled by Ben Langmead on 9. December 2022",
     "kraken_focused": "\/home\/jonr\/Prosjekter\/learning_nextflow\/Data\/Kraken_db\/db_HBV\/",  
     "//kraken_focused_comment": "NCBI Hepacivirus genomes with HCV genotypes from NCBI added|",
     "blast_db": "\/home\/jonr\/Prosjekter\/learning_nextflow\/Data\/Blast_db\/HBV_GLUE_genotypes.fasta", 
-    "//blast_db_comment": "HBV genotypes downloaded from the GLUE HBV website. Genotypes added to fasta header"
+    "//blast_db_comment": "HBV genotypes downloaded from the GLUE HBV website. Genotypes added to fasta header",
+    "rt_domain": "Data\/HBV_references\/DPOL_HBVD1_RT_domain.fasta",
+    "//rt_domain_comment": "rt-domain of the polymerase. DPOL_HBVD1 in uniprot"
 }
