@@ -1,11 +1,11 @@
 process HCV_GLUE_SQL {
 
-    container 'ubuntu:18.04'
+    container 'docker:latest'
 
     publishDir "${params.outdir}/7_glue", mode:'copy', pattern: '*.{html}'
 
     input:
-    tuple val(sampleName), path(scaffolds)
+    tuple val(sampleName), path("${sampleName}*.bam"), path("${sampleName}*.bai")
 
     output:
     path "*.html"
@@ -21,17 +21,18 @@ process HCV_GLUE_SQL {
 
     # Make a for loop over all consensus-sequences
 
-    # Start the genotyping and resistance analysis
-    # NB: Not working if multiple scaffolds in the scaffolds file
+    for bam in \$(ls *.bam)
+    do
     docker run --rm \
        --name gluetools \
-        -v \$PWD/${scaffolds}:/opt/input/${sampleName}.fa \
+        -v \$PWD/:/opt/input/\${bam} \
         -v \$PWD:/output \
         -w /opt/input \
         --link gluetools-mysql \
         cvrbioinformatics/gluetools:latest gluetools.sh \
         --console-option \
         log-level:FINEST \
-        --inline-cmd project hcv module phdrReportingController invoke-function reportFastaAsHtml /opt/input/${sampleName}.fa /output/${sampleName}.html
+        --inline-cmd project hcv module phdrReportingController invoke-function reportBamAsHtml /opt/input/\${bam} /output/\${bam}.html
+    done
     """
 }      
