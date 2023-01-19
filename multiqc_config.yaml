@@ -37,8 +37,13 @@ module_order:
       path_filters:
         - "./kraken2_subset/*"
   - bowtie2:
-      name: "Bowtie 2"
+      name: "Bowtie 2 (with duplicates)"
       info: "This section of the report shows Bowtie 2 mapping results against the closest viral reference sequences."
       path_filters:
-        - "./bowtie2/*"
+        - "./bowtie2_dups/*"
+  - bowtie2:
+      name: "Bowtie 2 (without duplicates)"
+      info: "This section of the report shows Bowtie 2 mapping results against the closest viral reference sequences."
+      path_filters:
+        - "./bowtie2_nodups/*"
 
