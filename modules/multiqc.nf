@@ -11,7 +11,8 @@ process MULTIQC {
     path ('kraken2_all/*')
     path ('kraken2_subset/*')
     path ('fastqc_trimmed/*')
-    path ('bowtie2/*')
+    path ('bowtie2_dups/*')
+    path ('bowtie2_nodups/*')
     //path ('assembly_spades/*')
 
     output:
