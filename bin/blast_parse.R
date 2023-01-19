@@ -40,17 +40,9 @@ if (agens == "HCV" | agens == "HBV") {
       "bitscore" = "X12")
   
   # Separate the genotype from the subject header
-  # For the HCV references the genotypes are before the accession
-  # For the HBV references the genotypes are after the accession
-  if (agens == "HCV") {
-    # Add a column for the genotype
-    scaf <- scaf %>% 
-      separate(sseqid, into = c("genotype", NA), remove = FALSE) 
-  } else if (agens == "HBV") {
-    # Add a column for the genotype
-    scaf <- scaf %>% 
-      separate(sseqid, into = c(NA, "genotype"), remove = FALSE)
-  }
+  # Add a column for the genotype
+  scaf <- scaf %>% 
+    separate(sseqid, into = c("genotype", NA), remove = FALSE) 
 
   # Write out the reformatted blast result
   write_csv(scaf, file = paste0(sampleName, "_blast_out.csv"))
