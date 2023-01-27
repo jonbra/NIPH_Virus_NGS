@@ -1,10 +1,10 @@
 {
     "agens": "HCV",
     "//agens_comment": "",
-    "samplelist": "samplesheets/2023.01.18-HCV_Run829.csv",
+    "samplelist": "samplesheets/HCV_recombinant_sample.csv",
     "outdir": "HCV_rnaviral",
     "spades_mode": "rnaviral",
-    "kraken_all": "\/media\/jonr\/SATA6TB1\/Kraken_db\/", 
+    "kraken_all": "\/media\/jonr\/SATA6TB\/Kraken_db\/", 
     "//kraken_all_comment": "PlusPFP database compiled by Ben Langmead on 9. December 2022",
     "kraken_focused": "\/home\/jonr\/Prosjekter\/learning_nextflow\/Data\/Kraken_db\/db_hepacivirus",  
     "//kraken_focused_comment": "NCBI Hepacivirus genomes with HCV genotypes from NCBI added|",
