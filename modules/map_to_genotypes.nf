@@ -1,6 +1,6 @@
 process MAP_TO_GENOTYPES {
     
-    container 'jonbra/viral_haplo:1.2'
+    container 'jonbra/viral_haplo:1.3'
 
     label 'small'
 

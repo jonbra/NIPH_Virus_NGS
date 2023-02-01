@@ -1,6 +1,6 @@
 process INDEX {
 
-    container 'jonbra/viral_haplo:1.2'
+    container 'jonbra/viral_haplo:1.3'
 
     tag "$genome"
     publishDir "${params.outdir}/index", mode:'copy', pattern:'*.{bt2,log,sh,yml}'
