@@ -3,6 +3,9 @@
 library(tidyverse)
 
 args <- commandArgs(trailingOnly = TRUE)
+if (length(args) < 2) {
+  stop("Usage: Rscript create_samplesheet.R <path_to_fastq_folders> <samplesheet_name>", call.=FALSE)
+}
 
 folder  <- args[1] # "/mnt/N/NGS/3-Sekvenseringsbiblioteker/2022/Illumina_RunXXX/Run820_Virus/Run820/"
 outfile <- args[2] # "2023.01.19-HCV_Run829.csv"
