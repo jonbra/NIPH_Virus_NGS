@@ -1,25 +1,26 @@
 nextflow.enable.dsl=2
 
-include { FASTQC } from "./modules/fastqc.nf"
-include { TRIM } from "./modules/trim.nf"
+include { FASTQC }                from "./modules/fastqc.nf"
+include { TRIM }                  from "./modules/trim.nf"
 include { FASTQC as FASTQC_TRIM } from "./modules/fastqc.nf"
-include { KRAKEN2 } from "./modules/kraken2.nf"
-include { KRAKEN2_FOCUSED } from "./modules/kraken2_focused.nf"
-include { REPAIR } from "./modules/repair.nf"
-include { SPADES } from "./modules/spades.nf"
-include { MULTIQC } from "./modules/multiqc.nf"
-include { BLASTN } from "./modules/blastn.nf"
-include { BLAST_PARSE } from "./modules/blast_parse.nf"
-include { MAP_TO_GENOTYPES } from "./modules/map_to_genotypes.nf"
-include { PLOT_COVERAGE } from "./modules/plot_coverage.nf"
-include { SUMMARIZE_MAPPING } from "./modules/summarize_mapping.nf"
-include { ABACAS } from "./modules/abacas.nf"
-include { INDEX } from "./modules/index.nf"
-include { DEDUP } from "./modules/dedup.nf"
-include { BOWTIE2 } from "./modules/bowtie2.nf"
-include { TANOTI } from "./modules/tanoti.nf"
-include { HCV_GLUE_SQL } from "./modules/hcv_glue.nf"
-include { RVA_GENO } from "./modules/rva_genotyping.nf"
+include { KRAKEN2 }               from "./modules/kraken2.nf"
+include { KRAKEN2_FOCUSED }       from "./modules/kraken2_focused.nf"
+include { REPAIR }                from "./modules/repair.nf"
+include { SPADES }                from "./modules/spades.nf"
+include { MULTIQC }               from "./modules/multiqc.nf"
+include { BLASTN }                from "./modules/blastn.nf"
+include { BLAST_PARSE }           from "./modules/blast_parse.nf"
+include { MAP_TO_GENOTYPES }      from "./modules/map_to_genotypes.nf"
+include { PLOT_COVERAGE }         from "./modules/plot_coverage.nf"
+include { SUMMARIZE_MAPPING }     from "./modules/summarize_mapping.nf"
+include { ABACAS }                from "./modules/abacas.nf"
+include { INDEX }                 from "./modules/index.nf"
+include { DEDUP }                 from "./modules/dedup.nf"
+include { BOWTIE2 }               from "./modules/bowtie2.nf"
+include { TANOTI }                from "./modules/tanoti.nf"
+include { HCV_GLUE_SQL }          from "./modules/hcv_glue.nf"
+include { RVA_GENO }              from "./modules/rva_genotyping.nf"
+include { CLIQUE_SNV }            from "./modules/cliquesnv.nf"
 //include { HBV_RT_BLAST } from "./modules/hbv_rt_blast.nf"
 //include { HBV_RT_BLAST_PARSE } from "./modules/hbv_rt_blast_parse.nf"
 
@@ -52,10 +53,10 @@ workflow {
   SUMMARIZE_MAPPING(MAP_TO_GENOTYPES.out.STATS.collect())
 
   // Run Genotyping for HBV
-  if (params.agens == 'HBV') {
-    HBV_RT_BLAST(scaffolds, params.rt_domain)
-    HBV_RT_BLAST_PARSE()
-  }
+  //if (params.agens == 'HBV') {
+  //  HBV_RT_BLAST(scaffolds, params.rt_domain)
+  //  HBV_RT_BLAST_PARSE()
+  //}
 
   if (params.map_to_reference) {
     DEDUP(TRIM.out.TRIM_out)
@@ -68,21 +69,27 @@ workflow {
     RVA_GENO(SPADES.out.scaffolds, genotypes)
   }
 
-  //HCV_GLUE_SQL(MAP_TO_GENOTYPES.out.BAM)
+  // Run GLUE for HCV
+  if (params.agens == 'HCV') {
+    HCV_GLUE_SQL(MAP_TO_GENOTYPES.out.GLUE.collect())
+  }
+
+  // Run CliqueSNV
+  CLIQUE_SNV(MAP_TO_GENOTYPES.out.GLUE.collect())
   
   //
   // MultiQC
   //
-MULTIQC(
-  params.multiqc_config,
-  FASTQC.out.FASTQC_out.collect{it[1]}.ifEmpty([]),
-  TRIM.out.log.collect{it[1]}.ifEmpty([]),
-  KRAKEN2.out.report.collect{it[1]}.ifEmpty([]),
-  KRAKEN2_FOCUSED.out.report.collect{it[1]}.ifEmpty([]),
-  FASTQC_TRIM.out.FASTQC_out.collect{it[1]}.ifEmpty([]),
-  MAP_TO_GENOTYPES.out.flagstat_dups.collect{it[1]}.ifEmpty([]),
-  MAP_TO_GENOTYPES.out.flagstat_nodups.collect{it[1]}.ifEmpty([])
-)
+  MULTIQC(
+    params.multiqc_config,
+    FASTQC.out.FASTQC_out.collect{it[1]}.ifEmpty([]),
+    TRIM.out.log.collect{it[1]}.ifEmpty([]),
+    KRAKEN2.out.report.collect{it[1]}.ifEmpty([]),
+    KRAKEN2_FOCUSED.out.report.collect{it[1]}.ifEmpty([]),
+    FASTQC_TRIM.out.FASTQC_out.collect{it[1]}.ifEmpty([]),
+    MAP_TO_GENOTYPES.out.flagstat_dups.collect{it[1]}.ifEmpty([]),
+    MAP_TO_GENOTYPES.out.flagstat_nodups.collect{it[1]}.ifEmpty([])
+  )
 
 }/*
 
