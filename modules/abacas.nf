@@ -29,11 +29,11 @@ process ABACAS {
         # Extract the genotype (first cut on underscore, then on dot)
         GENO=\$(echo \$i | cut -d '_' -f 1 | cut -d '.' -f 2)
         # Extract the first field (samplename) when cut on dot
-        # SAMPLE=\$(echo \$i | cut -d',' -f 1)
+        # SAMPLE=\$(echo \$i | cut -d '.' -f 1)
         # Pull out the reference
-        REF=\$(ls *\${GENO}*_ref.fa)
+        REF=\$(ls *.\${GENO}*_ref.fa)
         # Pull out the corresponding scaffolds
-        SCAF=\$(ls *\${GENO}*_scaffolds.fa)
+        SCAF=\$(ls *.\${GENO}*_scaffolds.fa)
 
         # Run ABACAS
         abacas.pl \\
@@ -42,10 +42,10 @@ process ABACAS {
             -p nucmer \\
             -m \\
             -o ${sampleName}_\$GENO.abacas
-        mv nucmer.delta ${sampleName}.abacas.nucmer.delta
-        mv nucmer.filtered.delta ${sampleName}.abacas.nucmer.filtered.delta
-        mv nucmer.tiling ${sampleName}.abacas.nucmer.tiling
-        mv unused_contigs.out ${sampleName}.abacas.unused.contigs.out
+        mv nucmer.delta ${sampleName}_\$GENO.abacas.nucmer.delta
+        mv nucmer.filtered.delta ${sampleName}_\$GENO.abacas.nucmer.filtered.delta
+        mv nucmer.tiling ${sampleName}_\$GENO.abacas.nucmer.tiling
+        mv unused_contigs.out ${sampleName}_\$GENO.abacas.unused.contigs.out
     done
 
     cp .command.log ${sampleName}.abacas_command.log
