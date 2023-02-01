@@ -16,6 +16,7 @@ process MAP_TO_GENOTYPES {
     tuple val(sampleName), path("${sampleName}*nodups.bam"), path("${sampleName}*nodups.bam.bai"), emit: BAM
     tuple val(sampleName), path("*.withdups.flagstat")                                           , emit: flagstat_dups
     tuple val(sampleName), path("*.nodups.flagstat")                                             , emit: flagstat_nodups
+    path '*.nodups.bam'                                                                          , emit: GLUE
     path '*.stats'                                                                               , emit: STATS
     path '*.gz'                                                                                  , emit: DEPTH
     path '*.yml'
