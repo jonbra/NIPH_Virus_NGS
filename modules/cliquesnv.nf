@@ -1,20 +1,37 @@
 process CLIQUE_SNV {
 
+  container 'jonbra/viral_haplo:1.3'
+
   publishDir "${params.outdir}/2_clique_snv/", mode:'copy', pattern:'*.{fasta,json}'
 
+  label 'medium'
+
   input:
-  path samfile
+  path 'bamfiles/'
 
   output:
   path ("*.fasta"), emit: CLIQUE_out
   path "*.json"
 
-  when:
   script:
   """
-  mkdir TEST
-  #java -jar /usr/local/bin/clique-snv.jar -m snv-illumina -threads $task.cpus -outDir TEST -in ${samfile} -fdf extended
-  cliquesnv -m snv-illumina -threads $task.cpus -outDir TEST -in ${samfile} -fdf extended
+  #mkdir bamfiles/TMP
+  cd bamfiles/
+  for i in \$(ls *.bam)
+  do
+  BASE=\${i%_ref.fa.sorted.nodups.bam}.sam
+  IN=\${i%_ref.fa.sorted.nodups.bam}_modified.sam
+  
+  # convert to sam
+  samtools view -h -O SAM -o \${BASE} \${i}
+
+  # Remove @PG header line
+  grep -v "@PG" \${BASE} > \${IN}
+
+  java -jar ${projectDir}/bin/clique-snv.jar -m snv-illumina -threads $task.cpus -outDir ../ -in \${IN} -fdf extended
+  done
   """
 
 }
+
+//   #cliquesnv -m snv-illumina -threads $task.cpus -outDir ../TMP -in ${samfile} -fdf extended
