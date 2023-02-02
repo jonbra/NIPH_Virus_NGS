@@ -6,41 +6,39 @@ process HBV_RT_BLAST {
     publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     input:
-    tuple val(sampleName), path(scaffolds), path(read1), path(read2)
+    path 'scaffolds/'
     path reference
 
     output:
-    tuple val(sampleName), path("${sampleName}_blast.out"), path(scaffolds), path(read1), path(read2), path(blast_db), emit: blastn_out
+    path "*.json", emit: rt_blast
     path "*.{log,sh,yml}"
 
     script:
 
     """
-    makeblastdb \\
-        -in $blast_db \\
-        -dbtype nucl
+    cd scaffolds/
+    for i in \$(ls *scaffolds.fa)
+    do
 
-    # NB! Hvordan fungerer dette når jeg blaster alle scaffoldsene? Bør jeg heller ta inputet fra Blast parse hvor scaffoldsene er splittet i genotyper?
+    #TODO: Determine the genotype of the query sequence 
+    # and then choose subject sequence accordingly. 
+    # Can be done with an if statement inside the loop?
+
     blastx \\
-        -query HBV_results_rnaviral/4_spades/HBV112022A1.scaffolds.fa \\
-        -subject Data/HBV_references/DPOL_HBVD1_RT_domain.fasta \\
+        -query \${i} \\
+        -subject ../$reference \\
         -outfmt 15 \\
-        -qcov_hsp_perc 20 > blast.json
+        -qcov_hsp_perc 20 > ../\${i%scaffolds.fa}_rt_blastx.json
 
+    done
 
-    blastn \\
-        -db $blast_db \\
-        -query $scaffolds \\
-        -outfmt 6 \\
-        -max_target_seqs 1 \\
-        -out ${sampleName}_blast.out
-    
-    cp .command.log ${sampleName}.blastn_command.log
-    cp .command.sh ${sampleName}.blastn_command.sh
+    cd ../
+    cp .command.log blastx_command.log
+    cp .command.sh blastx_command.sh
 
-    cat <<-END_VERSIONS > blastn_versions.yml
+    cat <<-END_VERSIONS > blastx_versions.yml
     "${task.process}":
-        blast: \$(blastn -version 2>&1 | sed 's/^.*blastn: //; s/ .*\$//')
+        blast: \$(blastx -version 2>&1 | sed 's/^.*blastx: //; s/ .*\$//')
     END_VERSIONS
     """
 }
