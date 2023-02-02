@@ -1,12 +1,13 @@
 process HCV_GLUE_SQL {
 
-    publishDir "${params.outdir}/7_glue", mode:'copy', pattern: '*.html'
+    publishDir "${params.outdir}/7_glue", mode:'copy', pattern: '*.{html,json}'
 
     input:
     path 'bams/'
 
     output:
     path "*.html"
+    path "*.json", emit: GLUE_json
 
     script:
     """
@@ -34,6 +35,15 @@ process HCV_GLUE_SQL {
         cvrbioinformatics/gluetools:latest gluetools.sh \
         --console-option log-level:FINEST \
         --inline-cmd project hcv module phdrReportingController invoke-function reportBamAsHtml \${bam} 15.0 \${bam}.html
+
+    docker run --rm \
+       --name gluetools \
+        -v \$PWD:/opt/bams \
+        -w /opt/bams \
+        --link gluetools-mysql \
+        cvrbioinformatics/gluetools:latest gluetools.sh \
+        --console-option cmd-result-format:json -EC \
+        --inline-cmd project hcv module phdrReportingController invoke-function reportBam \${bam} 15.0 > \${bam}.json
     done
     """
 }      
