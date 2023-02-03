@@ -21,8 +21,8 @@ include { TANOTI }                from "./modules/tanoti.nf"
 include { HCV_GLUE_SQL }          from "./modules/hcv_glue.nf"
 include { RVA_GENO }              from "./modules/rva_genotyping.nf"
 include { CLIQUE_SNV }            from "./modules/cliquesnv.nf"
-//include { HBV_RT_BLAST } from "./modules/hbv_rt_blast.nf"
-//include { HBV_RT_BLAST_PARSE } from "./modules/hbv_rt_blast_parse.nf"
+include { HBV_RT_BLAST }          from "./modules/hbv_rt_blast.nf"
+include { HBV_RT_BLAST_PARSE }    from "./modules/hbv_rt_blast_parse.nf"
 
 workflow {
   reads = Channel
@@ -53,10 +53,10 @@ workflow {
   SUMMARIZE_MAPPING(MAP_TO_GENOTYPES.out.STATS.collect())
 
   // Run Genotyping for HBV
-  //if (params.agens == 'HBV') {
-  //  HBV_RT_BLAST(scaffolds, params.rt_domain)
-  //  HBV_RT_BLAST_PARSE()
-  //}
+  if (params.agens == 'HBV') {
+    HBV_RT_BLAST(BLAST_PARSE.out.RESISTANCE_BLAST.collect(), params.rt_domain)
+    HBV_RT_BLAST_PARSE(HBV_RT_BLAST.out.rt_blast, params.rt_domain)
+  }
 
   if (params.map_to_reference) {
     DEDUP(TRIM.out.TRIM_out)
