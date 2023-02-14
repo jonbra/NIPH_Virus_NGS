@@ -19,7 +19,6 @@ include { DEDUP }                 from "./modules/dedup.nf"
 include { BOWTIE2 }               from "./modules/bowtie2.nf"
 include { TANOTI }                from "./modules/tanoti.nf"
 include { HCV_GLUE_SQL }          from "./modules/hcv_glue.nf"
-include { RVA_GENO }              from "./modules/rva_genotyping.nf"
 include { CLIQUE_SNV }            from "./modules/cliquesnv.nf"
 include { HBV_RT_BLAST }          from "./modules/hbv_rt_blast.nf"
 include { HBV_RT_BLAST_PARSE }    from "./modules/hbv_rt_blast_parse.nf"
@@ -30,8 +29,6 @@ workflow {
           .splitCsv(header:true, sep:",")
           .map{ row -> tuple(row.sample, file(row.fastq_1), file(row.fastq_2))}
  
-  //blast_file = Channel.fromPath( params.blast_db )
-
   FASTQC(reads, 'raw')
   TRIM(reads)
   FASTQC_TRIM(TRIM.out.TRIM_out, 'trimmed')
@@ -63,10 +60,6 @@ workflow {
     INDEX(ref_file)
     BOWTIE2(DEDUP.out.DEDUP_out, ref_file, INDEX.out.INDEX_out)
     TANOTI(DEDUP.out.DEDUP_out, ref_file)
-  }
-
-  if (params.genotype) {
-    RVA_GENO(SPADES.out.scaffolds, genotypes)
   }
 
   // Run GLUE for HCV
