@@ -24,6 +24,10 @@ include { HBV_RT_BLAST }          from "./modules/hbv_rt_blast.nf"
 include { HBV_RT_BLAST_PARSE }    from "./modules/hbv_rt_blast_parse.nf"
 
 workflow {
+
+  // Make a copy of the samplelist in the result folder
+  file(params.samplelist).copyTo("${params.outdir}/${params.samplelist}")
+
   reads = Channel
           .fromPath(params.samplelist)
           .splitCsv(header:true, sep:",")
@@ -50,11 +54,12 @@ workflow {
   SUMMARIZE_MAPPING(MAP_TO_GENOTYPES.out.STATS.collect())
 
   // Run Genotyping for HBV
+  /*
   if (params.agens == 'HBV') {
     HBV_RT_BLAST(BLAST_PARSE.out.RESISTANCE_BLAST.collect(), params.rt_domain)
     HBV_RT_BLAST_PARSE(HBV_RT_BLAST.out.rt_blast, params.rt_domain)
   }
-
+*/
   if (params.map_to_reference) {
     DEDUP(TRIM.out.TRIM_out)
     INDEX(ref_file)
