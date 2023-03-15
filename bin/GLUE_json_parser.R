@@ -3,8 +3,16 @@
 library(tidyverse)
 library(jsonlite)
 
-json_files <- list.files(path = "/home/jonr/Prosjekter/learning_nextflow/HCV_recombinant/7_glue/",
-                         pattern = "json$",
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) < 1) {
+  stop("Usage: GLUE_json_parser.R <summary.csv>", call. = FALSE)
+}
+
+
+# Til Kamillas pipeline
+# Usage: GLUE_json_parser.R summary.csv
+
+json_files <- list.files(pattern = "json$",
                          full.names = TRUE)
 
 # Create final data file
@@ -42,12 +50,14 @@ df_final <- tibble(
   "PHE drug resistance extension version"  = character()
 )
   
-# Loop through all the json files and exract relevant info
+# Loop through all the json files and extract relevant info
 for (x in 1:length(json_files)) {
   json <- read_json(json_files[x])
   
   # Sample name
-  sample <- str_split_1(basename(json_files[x]), "\\.")[1]
+  #sample <- str_split_1(basename(json_files[x]), "\\.")[1]
+  # Kamillas script
+  sample <- str_split_1(basename(json_files[x]), "_")[1]
   
   # Få tak i subtype
   subtype <- json[["phdrReport"]][["samReferenceResult"]][["genotypingResult"]][["subtypeCladeCategoryResult"]][["shortRenderedName"]]
@@ -298,7 +308,12 @@ for (x in 1:length(json_files)) {
   
 }
 
+# Kamillas script: Må binde df_final til summary-fila igjen
+sumamry <- read_tsv(args[1]) %>% # summary <- read_tsv("/home/jonr/Prosjekter/learning_nextflow/json-test/Run837_HCV_summaries_v7sort.tsv")
+  rename("Sample" = "Parameters:")
 
+# join the data
+summary_final <- left_join(summary, df_final)
 
-
+write_tsv(summary_final, file = "summary_with_glue.tsv")
 
