@@ -2,7 +2,7 @@ process CLIQUE_SNV {
 
   container 'jonbra/viral_haplo:1.3'
 
-  publishDir "${params.outdir}/2_clique_snv/", mode:'copy', pattern:'*.{fasta,json}'
+  publishDir "${params.outdir}/clique_snv/", mode:'copy', pattern:'*.{fasta,json}'
 
   label 'medium'
 
