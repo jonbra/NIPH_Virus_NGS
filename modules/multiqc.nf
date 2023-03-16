@@ -21,7 +21,7 @@ process MULTIQC {
     path 'multiqc_command.{log,sh}'
     path 'multiqc_versions.yml'
 
-    publishDir "${params.outdir}/6_multiqc/", mode: 'copy', pattern:'*multiqc_*'
+    publishDir "${params.outdir}/9_multiqc/", mode: 'copy', pattern:'*multiqc_*'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
     publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
