@@ -13,7 +13,7 @@ include { BLAST_PARSE }           from "./modules/blast_parse.nf"
 include { MAP_TO_GENOTYPES }      from "./modules/map_to_genotypes.nf"
 include { PLOT_COVERAGE }         from "./modules/plot_coverage.nf"
 include { SUMMARIZE_MAPPING }     from "./modules/summarize_mapping.nf"
-include { ABACAS }                from "./modules/abacas.nf"
+//include { ABACAS }                from "./modules/abacas.nf"
 include { INDEX }                 from "./modules/index.nf"
 include { DEDUP }                 from "./modules/dedup.nf"
 include { BOWTIE2 }               from "./modules/bowtie2.nf"
@@ -45,7 +45,7 @@ workflow {
   BLASTN(SPADES.out.scaffolds, params.blast_db)
   BLAST_PARSE(BLASTN.out.blastn_out)
   MAP_TO_GENOTYPES(BLAST_PARSE.out.FOR_MAPPING)
-  ABACAS(BLAST_PARSE.out.FOR_ABACAS)
+  //ABACAS(BLAST_PARSE.out.FOR_ABACAS)
 
   // Plot the coverage of all the genotype mappings
   PLOT_COVERAGE(MAP_TO_GENOTYPES.out.DEPTH.collect())
