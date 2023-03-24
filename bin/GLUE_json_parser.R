@@ -12,7 +12,8 @@ if (length(args) < 1) {
 # Til Kamillas pipeline
 # Usage: GLUE_json_parser.R summary.csv
 
-json_files <- list.files(pattern = "json$",
+json_files <- list.files(path = "GLUE-rapport_json/",
+                         pattern = "json$",
                          full.names = TRUE)
 
 # Create final data file
@@ -57,7 +58,7 @@ for (x in 1:length(json_files)) {
   # Sample name
   #sample <- str_split_1(basename(json_files[x]), "\\.")[1]
   # Kamillas script
-  sample <- str_split_1(basename(json_files[x]), "_")[1]
+  sample <- unlist(strsplit(basename(json_files[x]), "\\."))[1]
   
   # Få tak i subtype
   subtype <- json[["phdrReport"]][["samReferenceResult"]][["genotypingResult"]][["subtypeCladeCategoryResult"]][["shortRenderedName"]]
@@ -297,9 +298,9 @@ for (x in 1:length(json_files)) {
     unite("NS5B", c(dasabuvir_mut, sofosbuvir_mut), sep = ";", na.rm = TRUE) 
   
   # Gjøre om innholdet i cellene til en vector, deretter fjerne dupliater i vektoren
-  df$NS34A <- unique(str_split_1(tmp %>% pull(NS34A), ";"))
-  df$NS5A <- unique(str_split_1(tmp %>% pull(NS5A), ";"))
-  df$NS5B <- unique(str_split_1(tmp %>% pull(NS5B), ";"))
+  try(df$NS34A <- unique(unlist(strsplit(tmp %>% pull(NS34A), ";"))))
+  try(df$NS5A <- unique(unlist(strsplit(tmp %>% pull(NS5A), ";"))))
+  try(df$NS5B <- unique(unlist(strsplit(tmp %>% pull(NS5B), ";"))))
   
   df <- as_tibble(df)
   
@@ -309,11 +310,11 @@ for (x in 1:length(json_files)) {
 }
 
 # Kamillas script: Må binde df_final til summary-fila igjen
-sumamry <- read_tsv(args[1]) %>% # summary <- read_tsv("/home/jonr/Prosjekter/learning_nextflow/json-test/Run837_HCV_summaries_v7sort.tsv")
+summary <- read_tsv(args[1]) %>% # summary <- read_tsv("/home/jonr/Prosjekter/learning_nextflow/json-test/Run837_HCV_summaries_v7sort.tsv")
   rename("Sample" = "Parameters:")
 
 # join the data
 summary_final <- left_join(summary, df_final)
 
-write_tsv(summary_final, file = "summary_with_glue.tsv")
+write_tsv(summary_final, file = "summary_with_glue.csv")
 
