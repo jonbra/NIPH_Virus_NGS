@@ -2,9 +2,11 @@
 work/*
 *results*/*
 samplesheets/*
-HCV_results/*
-RVA_results/*
-HBV_results/*
+HCV_*/*
+RVA_*/*
+HBV_*/*
+MPX_*/*
+ROV_*/*
 HCV-nf/*
 Data/Raw_files/*
 Data/Kraken_db/*
