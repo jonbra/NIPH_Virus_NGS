@@ -79,7 +79,7 @@ for (x in 1:length(json_files)) {
     # Sample name
     #sample <- str_split_1(basename(json_files[x]), "\\.")[1]
     # Kamillas script
-    sample <- unlist(strsplit(basename(json_files[x]), "\\."))[1]
+    sample <- unlist(strsplit(unlist(strsplit(basename(json_files[x]), "\\."))[1], "_"))[1]
     
     # Få tak i subtype
     subtype <- json[["phdrReport"]][["samReferenceResult"]][["genotypingResult"]][["subtypeCladeCategoryResult"]][["shortRenderedName"]]
