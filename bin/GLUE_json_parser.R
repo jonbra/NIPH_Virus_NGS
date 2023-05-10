@@ -72,119 +72,122 @@ genes_drugs <- list("NS3"  = c("glecaprevir", "grazoprevir", "paritaprevir", "vo
                     "NS5B" = c("dasabuvir", "sofosbuvir"))
 
 for (x in 1:length(json_files)) {
-  json <- read_json(json_files[x])
+  try(json <- read_json(json_files[x]))
   
-  # Sample name
-  #sample <- str_split_1(basename(json_files[x]), "\\.")[1]
-  # Kamillas script
-  sample <- unlist(strsplit(basename(json_files[x]), "\\."))[1]
-  
-  # Få tak i subtype
-  subtype <- json[["phdrReport"]][["samReferenceResult"]][["genotypingResult"]][["subtypeCladeCategoryResult"]][["shortRenderedName"]]
-  
-  # Versjoner:
-  projectVersion <- json[["phdrReport"]][["projectVersion"]]
-  extensionVersion <- json[["phdrReport"]][["extensionVersion"]]
-  engineVersion <- json[["phdrReport"]][["engineVersion"]]
-  
-  # One row per sample
-  # Create a temporary dataframe to populate
-  df <- as.data.frame(matrix(nrow = 1, ncol = 46))
-  colnames(df) <- c("Sample", 
-                    "glecaprevir", 
-                    "glecaprevir_mut",
-                    "glecaprevir_mut_short",
-                    "grazoprevir", 
-                    "grazoprevir_mut", 
-                    "grazoprevir_mut_short", 
-                    "paritaprevir", 
-                    "paritaprevir_mut", 
-                    "paritaprevir_mut_short", 
-                    "voxilaprevir", 
-                    "voxilaprevir_mut", 
-                    "voxilaprevir_mut_short", 
-                    "NS34A",
-                    "NS34A_short",
-                    "daclatasvir", 
-                    "daclatasvir_mut", 
-                    "daclatasvir_mut_short", 
-                    "elbasvir", 
-                    "elbasvir_mut", 
-                    "elbasvir_mut_short", 
-                    "ledipasvir", 
-                    "ledipasvir_mut", 
-                    "ledipasvir_mut_short", 
-                    "ombitasvir", 
-                    "ombitasvir_mut", 
-                    "ombitasvir_mut_short", 
-                    "pibrentasvir",
-                    "pibrentasvir_mut",
-                    "pibrentasvir_mut_short",
-                    "velpatasvir", 
-                    "velpatasvir_mut", 
-                    "velpatasvir_mut_short", 
-                    "NS5A",
-                    "NS5A_short",
-                    "dasabuvir",
-                    "dasabuvir_mut",
-                    "dasabuvir_mut_short",
-                    "sofosbuvir",
-                    "sofosbuvir_mut",
-                    "sofosbuvir_mut_short",
-                    "NS5B",
-                    "NS5B_short",
-                    "HCV project version",
-                    "GLUE engine version",
-                    "PHE drug resistance extension version")
-  
-  df$Sample[1] <- sample
-  df$`HCV project version` <- projectVersion
-  df$`GLUE engine version` <- engineVersion
-  df$`PHE drug resistance extension version` <- extensionVersion 
-
-  # Dette er underlisten for Drug Scores. Lengden av denne angir hvor mange drugs som er funnet.
-  # Under drugScores så er det en ny liste for hver drug category
-  if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]]) > 0) {
-    for (i in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]])) {
-      # Så er det en ny liste innenfor hver drug score igjen med drug for hver kategori. Denne heter drugAssessemnts
-      for (k in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]])) {
-        for (l in 1:length(genes_drugs)){
-          if (str_detect(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["category"]], names(genes_drugs)[l])) {
-            for (m in 1:length(genes_drugs[[l]])) {
-              if (json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drug"]][["id"]] == genes_drugs[[l]][m] & length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drugScoreDisplayShort"]]) > 0) {
-                df[[genes_drugs[[l]][m]]] <- json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drugScoreDisplayShort"]]
-                
-                # De tre kategoriene er lister. Hvis lengden er > 0 betyr det at det er en mutasjon i den
-                mut <- vector(mode = "character") # Create empty vector to hold mutations
-                mut_short <- vector(mode = "character") # Create empty vector to hold mutations
-                if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]]) > 0) {
-                  for (n in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]])) {
-                    mut <- c(mut, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]][[n]][["displayStructure"]])
-                    mut_short <- c(mut_short, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]][[n]][["structure"]])
+  # Only read the proper json GLUE reports (i.e. that there was a good sequence)
+  if (names(json) == "phdrReport") {
+    # Sample name
+    #sample <- str_split_1(basename(json_files[x]), "\\.")[1]
+    # Kamillas script
+    sample <- unlist(strsplit(basename(json_files[x]), "\\."))[1]
+    
+    # Få tak i subtype
+    subtype <- json[["phdrReport"]][["samReferenceResult"]][["genotypingResult"]][["subtypeCladeCategoryResult"]][["shortRenderedName"]]
+    
+    # Versjoner:
+    projectVersion <- json[["phdrReport"]][["projectVersion"]]
+    extensionVersion <- json[["phdrReport"]][["extensionVersion"]]
+    engineVersion <- json[["phdrReport"]][["engineVersion"]]
+    
+    # One row per sample
+    # Create a temporary dataframe to populate
+    df <- as.data.frame(matrix(nrow = 1, ncol = 46))
+    colnames(df) <- c("Sample", 
+                      "glecaprevir", 
+                      "glecaprevir_mut",
+                      "glecaprevir_mut_short",
+                      "grazoprevir", 
+                      "grazoprevir_mut", 
+                      "grazoprevir_mut_short", 
+                      "paritaprevir", 
+                      "paritaprevir_mut", 
+                      "paritaprevir_mut_short", 
+                      "voxilaprevir", 
+                      "voxilaprevir_mut", 
+                      "voxilaprevir_mut_short", 
+                      "NS34A",
+                      "NS34A_short",
+                      "daclatasvir", 
+                      "daclatasvir_mut", 
+                      "daclatasvir_mut_short", 
+                      "elbasvir", 
+                      "elbasvir_mut", 
+                      "elbasvir_mut_short", 
+                      "ledipasvir", 
+                      "ledipasvir_mut", 
+                      "ledipasvir_mut_short", 
+                      "ombitasvir", 
+                      "ombitasvir_mut", 
+                      "ombitasvir_mut_short", 
+                      "pibrentasvir",
+                      "pibrentasvir_mut",
+                      "pibrentasvir_mut_short",
+                      "velpatasvir", 
+                      "velpatasvir_mut", 
+                      "velpatasvir_mut_short", 
+                      "NS5A",
+                      "NS5A_short",
+                      "dasabuvir",
+                      "dasabuvir_mut",
+                      "dasabuvir_mut_short",
+                      "sofosbuvir",
+                      "sofosbuvir_mut",
+                      "sofosbuvir_mut_short",
+                      "NS5B",
+                      "NS5B_short",
+                      "HCV project version",
+                      "GLUE engine version",
+                      "PHE drug resistance extension version")
+    
+    df$Sample[1] <- sample
+    df$`HCV project version` <- projectVersion
+    df$`GLUE engine version` <- engineVersion
+    df$`PHE drug resistance extension version` <- extensionVersion 
+    
+    # Dette er underlisten for Drug Scores. Lengden av denne angir hvor mange drugs som er funnet.
+    # Under drugScores så er det en ny liste for hver drug category
+    if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]]) > 0) {
+      for (i in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]])) {
+        # Så er det en ny liste innenfor hver drug score igjen med drug for hver kategori. Denne heter drugAssessemnts
+        for (k in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]])) {
+          for (l in 1:length(genes_drugs)){
+            if (str_detect(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["category"]], names(genes_drugs)[l])) {
+              for (m in 1:length(genes_drugs[[l]])) {
+                if (json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drug"]][["id"]] == genes_drugs[[l]][m] & length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drugScoreDisplayShort"]]) > 0) {
+                  df[[genes_drugs[[l]][m]]] <- json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drugScoreDisplayShort"]]
+                  
+                  # De tre kategoriene er lister. Hvis lengden er > 0 betyr det at det er en mutasjon i den
+                  mut <- vector(mode = "character") # Create empty vector to hold mutations
+                  mut_short <- vector(mode = "character") # Create empty vector to hold mutations
+                  if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]]) > 0) {
+                    for (n in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]])) {
+                      mut <- c(mut, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]][[n]][["displayStructure"]])
+                      mut_short <- c(mut_short, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]][[n]][["structure"]])
+                    }
+                  } 
+                  if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]]) > 0) {
+                    for (n in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]])) {
+                      mut <- c(mut, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]][[n]][["displayStructure"]])
+                      mut_short <- c(mut_short, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]][[n]][["structure"]])
+                    }
+                  } 
+                  if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]]) > 0) {
+                    for (n in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]])) {
+                      mut <- c(mut, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]][[n]][["displayStructure"]])
+                      mut_short <- c(mut_short, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]][[n]][["structure"]])
+                    }
                   }
-                } 
-                if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]]) > 0) {
-                  for (n in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]])) {
-                    mut <- c(mut, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]][[n]][["displayStructure"]])
-                    mut_short <- c(mut_short, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]][[n]][["structure"]])
-                  }
-                } 
-                if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]]) > 0) {
-                  for (n in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]])) {
-                    mut <- c(mut, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]][[n]][["displayStructure"]])
-                    mut_short <- c(mut_short, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]][[n]][["structure"]])
-                  }
+                  mut <- paste(mut, collapse = ";")
+                  mut_short <- paste(mut_short, collapse = ";")
+                  df[[paste0(genes_drugs[[l]][m], "_mut")]] <- mut
+                  df[[paste0(genes_drugs[[l]][m], "_mut_short")]] <- mut_short
                 }
-                mut <- paste(mut, collapse = ";")
-                mut_short <- paste(mut_short, collapse = ";")
-                df[[paste0(genes_drugs[[l]][m], "_mut")]] <- mut
-                df[[paste0(genes_drugs[[l]][m], "_mut_short")]] <- mut_short
               }
             }
           }
         }
       }
-    }
+    } 
   }
   
   # Then join mutations per drug category
