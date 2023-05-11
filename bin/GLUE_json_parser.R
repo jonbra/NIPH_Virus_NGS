@@ -159,40 +159,45 @@ for (x in 1:length(json_files)) {
       for (i in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]])) {
         # Så er det en ny liste innenfor hver drug score igjen med drug for hver kategori. Denne heter drugAssessemnts
         for (k in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]])) {
-          for (l in 1:length(genes_drugs)){
-            if (str_detect(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["category"]], names(genes_drugs)[l])) {
-              for (m in 1:length(genes_drugs[[l]])) {
-                if (json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drug"]][["id"]] == genes_drugs[[l]][m] & length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drugScoreDisplayShort"]]) > 0) {
-                  df[[genes_drugs[[l]][m]]] <- json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drugScoreDisplayShort"]]
-                  
-                  # De tre kategoriene er lister. Hvis lengden er > 0 betyr det at det er en mutasjon i den
-                  mut <- vector(mode = "character") # Create empty vector to hold mutations
-                  mut_short <- vector(mode = "character") # Create empty vector to hold mutations
-                  if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]]) > 0) {
-                    for (n in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]])) {
-                      mut <- c(mut, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]][[n]][["displayStructure"]])
-                      mut_short <- c(mut_short, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]][[n]][["structure"]])
+            for (l in 1:length(genes_drugs)){
+              if (str_detect(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["category"]], names(genes_drugs)[l])) {
+                for (m in 1:length(genes_drugs[[l]])) {
+                  # Hvis det er sufficient coverage (denne evaluerer til TRUE):
+                  if (json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["sufficientCoverage"]]) {
+                    if (json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drug"]][["id"]] == genes_drugs[[l]][m] & length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drugScoreDisplayShort"]]) > 0) {
+                      df[[genes_drugs[[l]][m]]] <- json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drugScoreDisplayShort"]]
+                      
+                      # De tre kategoriene er lister. Hvis lengden er > 0 betyr det at det er en mutasjon i den
+                      mut <- vector(mode = "character") # Create empty vector to hold mutations
+                      mut_short <- vector(mode = "character") # Create empty vector to hold mutations
+                      if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]]) > 0) {
+                        for (n in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]])) {
+                          mut <- c(mut, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]][[n]][["displayStructure"]])
+                          mut_short <- c(mut_short, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_I"]][[n]][["structure"]])
+                        }
+                      } 
+                      if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]]) > 0) {
+                        for (n in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]])) {
+                          mut <- c(mut, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]][[n]][["displayStructure"]])
+                          mut_short <- c(mut_short, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]][[n]][["structure"]])
+                        }
+                      } 
+                      if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]]) > 0) {
+                        for (n in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]])) {
+                          mut <- c(mut, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]][[n]][["displayStructure"]])
+                          mut_short <- c(mut_short, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]][[n]][["structure"]])
+                        }
+                      }
+                      mut <- paste(mut, collapse = ";")
+                      mut_short <- paste(mut_short, collapse = ";")
+                      df[[paste0(genes_drugs[[l]][m], "_mut")]] <- mut
+                      df[[paste0(genes_drugs[[l]][m], "_mut_short")]] <- mut_short
                     }
-                  } 
-                  if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]]) > 0) {
-                    for (n in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]])) {
-                      mut <- c(mut, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]][[n]][["displayStructure"]])
-                      mut_short <- c(mut_short, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_II"]][[n]][["structure"]])
-                    }
-                  } 
-                  if (length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]]) > 0) {
-                    for (n in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]])) {
-                      mut <- c(mut, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]][[n]][["displayStructure"]])
-                      mut_short <- c(mut_short, json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["rasScores_category_III"]][[n]][["structure"]])
-                    }
-                  }
-                  mut <- paste(mut, collapse = ";")
-                  mut_short <- paste(mut_short, collapse = ";")
-                  df[[paste0(genes_drugs[[l]][m], "_mut")]] <- mut
-                  df[[paste0(genes_drugs[[l]][m], "_mut_short")]] <- mut_short
+                  }           else {
+                    df[[genes_drugs[[l]][m]]] <- "Insufficient coverage"
                 }
               }
-            }
+            } 
           }
         }
       }
