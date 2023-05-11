@@ -19,8 +19,8 @@ json_files <- list.files(path = "GLUE-rapport_json/",
 # Create final data file
 df_final <- tibble(
   "Sample" = character(), 
-  "Genotype" = character(),
-  "Subtype" = character(),
+  "GLUE_genotype" = character(),
+  "GLUE_subtype" = character(),
   "glecaprevir" = character(), 
   "glecaprevir_mut" = character(), 
   "glecaprevir_mut_short" = character(), 
@@ -98,8 +98,8 @@ for (x in 1:length(json_files)) {
     # Create a temporary dataframe to populate
     df <- as.data.frame(matrix(nrow = 1, ncol = 48))
     colnames(df) <- c("Sample", 
-                      "Genotype",
-                      "Subtype",
+                      "GLUE_genotype",
+                      "GLUE_subtype",
                       "glecaprevir", 
                       "glecaprevir_mut",
                       "glecaprevir_mut_short",
@@ -147,8 +147,8 @@ for (x in 1:length(json_files)) {
                       "PHE drug resistance extension version")
     
     df$Sample <- sample
-    df$Genotype <- genotype
-    df$Subtype <- subtype
+    df$GLUE_genotype <- genotype
+    df$GLUE_subtype <- subtype
     df$`HCV project version` <- projectVersion
     df$`GLUE engine version` <- engineVersion
     df$`PHE drug resistance extension version` <- extensionVersion 
