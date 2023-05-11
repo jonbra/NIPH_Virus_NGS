@@ -226,7 +226,9 @@ for (x in 1:length(json_files)) {
 
 # Kamillas script: Må binde df_final til summary-fila igjen
 run_name <- args[1]
-summary <- read_tsv(args[2]) %>% # summary <- read_tsv("/home/jonr/Prosjekter/learning_nextflow/json-test/Run837_HCV_summaries_v7sort.tsv")
+summary <- read_tsv(args[2],
+                    col_names = TRUE,
+                    cols(.default = "c")) %>% 
   rename("Sample" = "Parameters:")
 
 # join the data
