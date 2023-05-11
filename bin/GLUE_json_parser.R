@@ -19,6 +19,8 @@ json_files <- list.files(path = "GLUE-rapport_json/",
 # Create final data file
 df_final <- tibble(
   "Sample" = character(), 
+  "Genotype" = character(),
+  "Subtype" = character(),
   "glecaprevir" = character(), 
   "glecaprevir_mut" = character(), 
   "glecaprevir_mut_short" = character(), 
@@ -81,6 +83,9 @@ for (x in 1:length(json_files)) {
     # Kamillas script
     sample <- unlist(strsplit(unlist(strsplit(basename(json_files[x]), "\\."))[1], "_"))[1]
     
+    # Få tak i genotype
+    genotype <- json[["phdrReport"]][["samReferenceResult"]][["genotypingResult"]][["genotypeCladeCategoryResult"]][["shortRenderedName"]]
+    
     # Få tak i subtype
     subtype <- json[["phdrReport"]][["samReferenceResult"]][["genotypingResult"]][["subtypeCladeCategoryResult"]][["shortRenderedName"]]
     
@@ -91,8 +96,10 @@ for (x in 1:length(json_files)) {
     
     # One row per sample
     # Create a temporary dataframe to populate
-    df <- as.data.frame(matrix(nrow = 1, ncol = 46))
+    df <- as.data.frame(matrix(nrow = 1, ncol = 48))
     colnames(df) <- c("Sample", 
+                      "Genotype",
+                      "Subtype",
                       "glecaprevir", 
                       "glecaprevir_mut",
                       "glecaprevir_mut_short",
@@ -139,7 +146,9 @@ for (x in 1:length(json_files)) {
                       "GLUE engine version",
                       "PHE drug resistance extension version")
     
-    df$Sample[1] <- sample
+    df$Sample <- sample
+    df$Genotype <- genotype
+    df$Subtype <- subtype
     df$`HCV project version` <- projectVersion
     df$`GLUE engine version` <- engineVersion
     df$`PHE drug resistance extension version` <- extensionVersion 
