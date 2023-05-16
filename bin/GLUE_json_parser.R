@@ -68,11 +68,6 @@ df_final <- tibble(
   "PHE drug resistance extension version"  = character()
 )
 
-# List of genes and drugs
-genes_drugs <- list("NS3"  = c("glecaprevir", "grazoprevir", "paritaprevir", "voxilaprevir"), 
-                    "NS5A" = c("daclatasvir", "elbasvir", "ledipasvir", "ombitasvir", "pibrentasvir", "velpatasvir"), 
-                    "NS5B" = c("dasabuvir", "sofosbuvir"))
-
 for (x in 1:length(json_files)) {
   try(json <- read_json(json_files[x]))
   
@@ -159,13 +154,10 @@ for (x in 1:length(json_files)) {
       for (i in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]])) {
         # Så er det en ny liste innenfor hver drug score igjen med drug for hver kategori. Denne heter drugAssessemnts
         for (k in 1:length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]])) {
-            for (l in 1:length(genes_drugs)){
-              if (str_detect(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["category"]], names(genes_drugs)[l])) {
-                for (m in 1:length(genes_drugs[[l]])) {
                   # Hvis det er sufficient coverage (denne evaluerer til TRUE):
                   if (json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["sufficientCoverage"]]) {
-                    if (json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drug"]][["id"]] == genes_drugs[[l]][m] & length(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drugScoreDisplayShort"]]) > 0) {
-                      df[[genes_drugs[[l]][m]]] <- json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drugScoreDisplayShort"]]
+                    if (json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drugScoreDisplayShort"]] == "No resistance") {
+                      df[[json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drug"]][["id"]]]]  <- "No resistance"
                       
                       # De tre kategoriene er lister. Hvis lengden er > 0 betyr det at det er en mutasjon i den
                       mut <- vector(mode = "character") # Create empty vector to hold mutations
@@ -190,17 +182,14 @@ for (x in 1:length(json_files)) {
                       }
                       mut <- paste(mut, collapse = ";")
                       mut_short <- paste(mut_short, collapse = ";")
-                      df[[paste0(genes_drugs[[l]][m], "_mut")]] <- mut
-                      df[[paste0(genes_drugs[[l]][m], "_mut_short")]] <- mut_short
+                      df[[paste0(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drug"]][["id"]], "_mut")]] <- mut
+                      df[[paste0(json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drug"]][["id"]], "_mut_short")]] <- mut_short
                     }
-                  }           else {
-                    df[[genes_drugs[[l]][m]]] <- "Insufficient coverage"
+                  } else { 
+                    df[[json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drug"]][["id"]]]] <- "Insufficient coverage"
                 }
               }
             } 
-          }
-        }
-      }
     } 
   }
   
