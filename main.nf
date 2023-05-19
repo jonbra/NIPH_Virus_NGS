@@ -25,8 +25,9 @@ include { HBV_RT_BLAST_PARSE }    from "./modules/hbv_rt_blast_parse.nf"
 
 workflow {
 
-  // Make a copy of the samplelist in the result folder
+  // Make a copy of the samplelist and params-file in the result folder
   file(params.samplelist).copyTo("${params.outdir}/${params.samplelist}")
+  //file(params.params-file).copyTo("${params.outdir}/${params.params-file}")
 
   reads = Channel
           .fromPath(params.samplelist)
@@ -51,7 +52,8 @@ workflow {
   PLOT_COVERAGE(MAP_TO_GENOTYPES.out.DEPTH.collect())
 
   // Summarize the mapping statistics for all samples
-  SUMMARIZE_MAPPING(MAP_TO_GENOTYPES.out.STATS.collect())
+  SUMMARIZE_MAPPING(MAP_TO_GENOTYPES.out.STATS.collect(),
+                    MAP_TO_GENOTYPES.out.DEPTH.collect())
 
   // Run Genotyping for HBV
   /*
