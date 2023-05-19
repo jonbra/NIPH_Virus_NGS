@@ -33,12 +33,16 @@ workflow {
           .fromPath(params.samplelist)
           .splitCsv(header:true, sep:",")
           .map{ row -> tuple(row.sample, file(row.fastq_1), file(row.fastq_2))}
- 
+
+  INDEX(params.blast_db) 
   FASTQC(reads, 'raw')
   TRIM(reads)
   FASTQC_TRIM(TRIM.out.TRIM_out, 'trimmed')
   KRAKEN2(TRIM.out.TRIM_out, params.kraken_all)
   KRAKEN2_FOCUSED(TRIM.out.TRIM_out, params.kraken_focused)
+
+  // Include the reference-based sub-workflow at this stage. Run that separately to the end
+
 
   //SUBSET_KRAKEN2(TRIM.out.TRIM_out, KRAKEN2.out.report, KRAKEN2.out.classified_reads_assignment)
   //REPAIR(SUBSET_KRAKEN2.out.subset_reads_fastq)
@@ -64,7 +68,6 @@ workflow {
 */
   if (params.map_to_reference) {
     DEDUP(TRIM.out.TRIM_out)
-    INDEX(ref_file)
     BOWTIE2(DEDUP.out.DEDUP_out, ref_file, INDEX.out.INDEX_out)
     TANOTI(DEDUP.out.DEDUP_out, ref_file)
   }
