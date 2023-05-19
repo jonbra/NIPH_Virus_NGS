@@ -35,4 +35,9 @@ Then you need to provide some parameters...
 ```
 ```
 
+And run the pipeline:
+```
+nextflow run main.nf --samplelist samplesheets/RoV_Run875_samplesheet.csv -params-file RoV-params.json
+```
+
 ## Pipeline overview
