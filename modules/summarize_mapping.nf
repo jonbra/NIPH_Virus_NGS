@@ -12,6 +12,7 @@ process SUMMARIZE_MAPPING {
 
     input:
     path 'stats/'
+    path 'depth/'
 
     output:
     path '*csv', emit: mapping_summary
