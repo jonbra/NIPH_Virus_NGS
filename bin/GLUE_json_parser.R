@@ -158,7 +158,7 @@ for (x in 1:length(json_files)) {
                   if (json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["sufficientCoverage"]]) {
                     if (json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drugScoreDisplayShort"]] == "No resistance") {
                       df[[json[["phdrReport"]][["samReferenceResult"]][["drugScores"]][[i]][["drugAssessments"]][[k]][["drug"]][["id"]]]]  <- "No resistance"
-                      
+                    } else {  
                       # De tre kategoriene er lister. Hvis lengden er > 0 betyr det at det er en mutasjon i den
                       mut <- vector(mode = "character") # Create empty vector to hold mutations
                       mut_short <- vector(mode = "character") # Create empty vector to hold mutations
