@@ -5,7 +5,7 @@ include { TRIM }                  from "./modules/trim.nf"
 include { FASTQC as FASTQC_TRIM } from "./modules/fastqc.nf"
 include { KRAKEN2 }               from "./modules/kraken2.nf"
 include { KRAKEN2_FOCUSED }       from "./modules/kraken2_focused.nf"
-include { REPAIR }                from "./modules/repair.nf"
+//include { REPAIR }                from "./modules/repair.nf"
 include { SPADES }                from "./modules/spades.nf"
 include { MULTIQC }               from "./modules/multiqc.nf"
 include { BLASTN }                from "./modules/blastn.nf"
@@ -40,8 +40,6 @@ workflow {
       file(params.samplelist).copyTo("${params.outdir}/${params.samplelist}")
       //file(params.params-file).copyTo("${params.outdir}/${params.params-file}")
   }
-
-
 
   INDEX(params.blast_db) 
   FASTQC(reads, 'raw')
