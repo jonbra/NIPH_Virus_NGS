@@ -1,5 +1,6 @@
 process FASTQC {
 
+    conda "bioconda::fastqc=0.11.9"
     container 'quay.io/biocontainers/fastqc:0.11.9--hdfd78af_1'
 
     publishDir "${params.outdir}/1_fastqc/", mode:'copy', pattern:'*.{zip}'
