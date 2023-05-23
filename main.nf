@@ -25,17 +25,27 @@ include { HBV_RT_BLAST_PARSE }    from "./modules/hbv_rt_blast_parse.nf"
 
 workflow {
 
-  // Make a copy of the samplelist and params-file in the result folder
-  file(params.samplelist).copyTo("${params.outdir}/${params.samplelist}")
-  //file(params.params-file).copyTo("${params.outdir}/${params.params-file}")
+  if (params.test) {
+      reads = Channel
+              .fromSRA('ERR10028751')
+              .map{ tuple(it[0], it[1][0], it[1][1])}
+  }
+  else {
+      reads = Channel
+              .fromPath(params.samplelist)
+              .splitCsv(header:true, sep:",")
+              .map{ row -> tuple(row.sample, file(row.fastq_1), file(row.fastq_2))}
+      
+      // Make a copy of the samplelist and params-file in the result folder
+      file(params.samplelist).copyTo("${params.outdir}/${params.samplelist}")
+      //file(params.params-file).copyTo("${params.outdir}/${params.params-file}")
+  }
 
-  reads = Channel
-          .fromPath(params.samplelist)
-          .splitCsv(header:true, sep:",")
-          .map{ row -> tuple(row.sample, file(row.fastq_1), file(row.fastq_2))}
+
 
   INDEX(params.blast_db) 
   FASTQC(reads, 'raw')
+  
   TRIM(reads)
   FASTQC_TRIM(TRIM.out.TRIM_out, 'trimmed')
   KRAKEN2(TRIM.out.TRIM_out, params.kraken_all)
@@ -60,12 +70,13 @@ workflow {
                     MAP_TO_GENOTYPES.out.DEPTH.collect())
 
   // Run Genotyping for HBV
-  /*
+  
   if (params.agens == 'HBV') {
     HBV_RT_BLAST(BLAST_PARSE.out.RESISTANCE_BLAST.collect(), params.rt_domain)
     HBV_RT_BLAST_PARSE(HBV_RT_BLAST.out.rt_blast, params.rt_domain)
   }
-*/
+
+
   if (params.map_to_reference) {
     DEDUP(TRIM.out.TRIM_out)
     BOWTIE2(DEDUP.out.DEDUP_out, ref_file, INDEX.out.INDEX_out)
@@ -73,9 +84,9 @@ workflow {
   }
 
   // Run GLUE for HCV
-  if (params.agens == 'HCV') {
-    HCV_GLUE_SQL(MAP_TO_GENOTYPES.out.GLUE.collect())
-  }
+ // if (params.agens == 'HCV') {
+ //   HCV_GLUE_SQL(MAP_TO_GENOTYPES.out.GLUE.collect())
+ // }
 
   // Run CliqueSNV
   //CLIQUE_SNV(MAP_TO_GENOTYPES.out.GLUE.collect())
@@ -94,7 +105,8 @@ workflow {
     MAP_TO_GENOTYPES.out.flagstat_nodups.collect{it[1]}.ifEmpty([])
   )
 
-}/*
+}
+/*
 
 
     //
