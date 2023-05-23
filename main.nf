@@ -19,7 +19,7 @@ include { DEDUP }                 from "./modules/dedup.nf"
 include { BOWTIE2 }               from "./modules/bowtie2.nf"
 include { TANOTI }                from "./modules/tanoti.nf"
 include { HCV_GLUE_SQL }          from "./modules/hcv_glue.nf"
-include { CLIQUE_SNV }            from "./modules/cliquesnv.nf"
+//include { CLIQUE_SNV }            from "./modules/cliquesnv.nf"
 include { HBV_RT_BLAST }          from "./modules/hbv_rt_blast.nf"
 include { HBV_RT_BLAST_PARSE }    from "./modules/hbv_rt_blast_parse.nf"
 
@@ -78,7 +78,7 @@ workflow {
   }
 
   // Run CliqueSNV
-  CLIQUE_SNV(MAP_TO_GENOTYPES.out.GLUE.collect())
+  //CLIQUE_SNV(MAP_TO_GENOTYPES.out.GLUE.collect())
   
   //
   // MultiQC
