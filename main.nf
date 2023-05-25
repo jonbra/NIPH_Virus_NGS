@@ -70,12 +70,14 @@ workflow {
   }
 
   // Run GLUE for HCV
-  if (params.agens == 'HCV') {
+  if (params.glue) {
     HCV_GLUE_SQL(MAP_TO_GENOTYPES.out.GLUE.collect())
   }
 
   // Run CliqueSNV
-  CLIQUE_SNV(MAP_TO_GENOTYPES.out.GLUE.collect())
+  if (params.cliquesnv) {
+    CLIQUE_SNV(MAP_TO_GENOTYPES.out.GLUE.collect())
+  }
   
   //
   // MultiQC
