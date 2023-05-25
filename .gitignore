@@ -1,5 +1,6 @@
 .nextflow*
 work/*
+conda/*
 *results*/*
 samplesheets/*
 HCV_*/*

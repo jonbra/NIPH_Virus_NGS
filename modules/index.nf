@@ -1,6 +1,7 @@
 process INDEX {
 
-    container 'jonbra/viral_haplo:1.3'
+    conda 'bioconda::bowtie2=2.4.4'
+    container 'quay.io/biocontainers/bowtie2:2.4.4--py39hbb4e92a_0'
 
     tag "$genome"
     publishDir "${params.outdir}/index", mode:'copy', pattern:'*.{bt2,log,sh,yml}'

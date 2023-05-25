@@ -1,5 +1,6 @@
 process SPADES {
 
+    conda 'bioconda::spades=3.15.5'
     container 'quay.io/biocontainers/spades:3.15.4--h95f258a_0'
 
     maxForks 1
