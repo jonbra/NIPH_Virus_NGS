@@ -13,7 +13,7 @@ process MAP_ONE {
     path genome
     path genome_index
 
-    publishDir "${params.outdir}/ref-based", mode: 'copy', pattern:'*first_mapping*.{bam,bai,stats}'
+    publishDir "${params.outdir}/ref-based", mode: 'copy', pattern:'*first_mapping*.{stats}'
     publishDir "${params.outdir}/ref-based", mode: 'copy', pattern:'*.{log,sh,txt,yml}'
 
     output:
@@ -68,7 +68,7 @@ process MAP_TWO {
 
     output:
     //tuple val(sampleName), path ("${sampleName}.markdup.bam"), path ("${sampleName}.markdup.bam.bai"), optional: true, emit: markdup_out
-    tuple val(sampleName), path ("${sampleName}.major.sorted.bam"), path ("${sampleName}.major.sorted.bam.bai"), optional: true, emit: sorted_out
+    tuple val(sampleName), path ("${sampleName}.major.markdup.bam"), path ("${sampleName}.major.markdup.bam.bai"), optional: true, emit: majority_out
     path "*.log", emit: BOWTIE2_log
     path "*.{stats,sh,txt}"
 
@@ -134,7 +134,7 @@ process MAP_MINORITY {
 
     output:
     //tuple val(sampleName), path ("${sampleName}.markdup.bam"), path ("${sampleName}.markdup.bam.bai"), optional: true, emit: markdup_out
-    tuple val(sampleName), path ("${sampleName}.minor.sorted.bam"), path ("${sampleName}.minor.sorted.bam.bai"), optional: true, emit: sorted_out
+    tuple val(sampleName), path ("${sampleName}.minor.markdup.bam"), path ("${sampleName}.minor.markdup.bam.bai"), optional: true, emit: minority_out
     path "*.log", optional: true, emit: BOWTIE2_log
     path "*.{stats,sh,txt}", optional: true
 
@@ -185,12 +185,41 @@ process MAP_MINORITY {
     """
 }
 
+process CONSENSUS {
+
+    container 'andersenlabapps/ivar'
+
+    input:
+    tuple val(sampleName), path (bam), path (bai)
+
+    publishDir "${params.outdir}/ref-based", mode: 'copy', pattern:'.fa'
+    publishDir "${params.outdir}/ref-based", mode: 'copy', pattern:'*.sh,yml'
+
+    output:
+    tuple val(sampleName), path ("${sampleName}.*.fa"), optional: true, emit: consensus_out
+    path "*.{sh,yml}", optional: true
+
+    script:
+    """
+    samtools mpileup -aa -A -d 10000 -Q 20 ${bam} | ivar consensus -p ${sampleName} -m 5
+
+    cp .command.sh ${sampleName}.consensus.sh
+
+    cat <<-END_VERSIONS > consensus.versions.yml
+    "${task.process}":
+        samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
+        iVar: \$(echo \$(ivar version 2>&1))
+    END_VERSIONS
+    """
+}
+
 
 workflow REFERENCE_BASED {
 
     MAP_ONE(     TRIM.out.TRIM_out, params.blast_db, INDEX.out.INDEX_out                        ) 
     MAP_TWO(     TRIM.out.TRIM_out, params.blast_db, INDEX.out.INDEX_out, MAP_ONE.out.sorted_out)
     MAP_MINORITY(TRIM.out.TRIM_out, params.blast_db, INDEX.out.INDEX_out, MAP_ONE.out.sorted_out)
+    CONSENSUS(   MAP_TWO.out.majority_out)
 }
 
 
