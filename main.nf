@@ -19,9 +19,19 @@ include { DEDUP }                 from "./modules/dedup.nf"
 include { BOWTIE2 }               from "./modules/bowtie2.nf"
 include { TANOTI }                from "./modules/tanoti.nf"
 include { HCV_GLUE_SQL }          from "./modules/hcv_glue.nf"
-//include { CLIQUE_SNV }            from "./modules/cliquesnv.nf"
+include { CLIQUE_SNV }            from "./modules/cliquesnv.nf"
 include { HBV_RT_BLAST }          from "./modules/hbv_rt_blast.nf"
 include { HBV_RT_BLAST_PARSE }    from "./modules/hbv_rt_blast_parse.nf"
+
+if (params.reference_based) {
+  include { MAP_ONE      } from "./subworkflows/reference-based/map_one.nf"
+  include { MAP_MAJORITY      } from "./subworkflows/reference-based/map_majority.nf"
+  include { MAP_MINORITY } from "./subworkflows/reference-based/map_minority.nf"
+  include { CONSENSUS_MAJOR    } from "./subworkflows/reference-based/consensus_major.nf"
+  include { CONSENSUS_MINOR    } from "./subworkflows/reference-based/consensus_minor.nf"
+  //GLUE_REF_BASED
+  //SUMMARIZE_REF_BASED
+}
 
 workflow {
 
@@ -50,6 +60,15 @@ workflow {
   KRAKEN2_FOCUSED(TRIM.out.TRIM_out, params.kraken_focused)
 
   // Include the reference-based sub-workflow at this stage. Run that separately to the end
+  if (params.reference_based) {
+    MAP_ONE(     TRIM.out.TRIM_out, params.blast_db, INDEX.out.INDEX_out                        ) 
+    MAP_MAJORITY(     TRIM.out.TRIM_out, params.blast_db, INDEX.out.INDEX_out, MAP_ONE.out.sorted_out)
+    MAP_MINORITY(TRIM.out.TRIM_out, params.blast_db, INDEX.out.INDEX_out, MAP_ONE.out.sorted_out)
+    CONSENSUS_MAJOR(   MAP_MAJORITY.out.majority_out)
+    CONSENSUS_MINOR(  MAP_MINORITY.out.minority_out)
+    //GLUE_REF_BASED(.collect)
+    //SUMMARIZE_REF_BASED(.collect)
+  }
 
 
   //SUBSET_KRAKEN2(TRIM.out.TRIM_out, KRAKEN2.out.report, KRAKEN2.out.classified_reads_assignment)
@@ -68,17 +87,9 @@ workflow {
                     MAP_TO_GENOTYPES.out.DEPTH.collect())
 
   // Run Genotyping for HBV
-  
   if (params.agens == 'HBV') {
     HBV_RT_BLAST(BLAST_PARSE.out.RESISTANCE_BLAST.collect(), params.rt_domain)
     HBV_RT_BLAST_PARSE(HBV_RT_BLAST.out.rt_blast, params.rt_domain)
-  }
-
-
-  if (params.map_to_reference) {
-    DEDUP(TRIM.out.TRIM_out)
-    BOWTIE2(DEDUP.out.DEDUP_out, ref_file, INDEX.out.INDEX_out)
-    TANOTI(DEDUP.out.DEDUP_out, ref_file)
   }
 
   // Run GLUE for HCV
