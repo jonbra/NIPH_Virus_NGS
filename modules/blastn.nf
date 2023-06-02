@@ -12,6 +12,7 @@ process BLASTN {
 
     output:
     tuple val(sampleName), path("${sampleName}_blast.out"), path(scaffolds), path(read1), path(read2), path(blast_db), emit: blastn_out
+    path("${sampleName}_blast.out")                                                                                  , emit: for_summarize
     path "*.{log,sh,yml}"
 
     script:
