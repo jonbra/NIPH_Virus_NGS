@@ -1,4 +1,4 @@
-# learning_nextflow
+# NIPH_Virus_NGS
 
 >**Warning**
 >This pipeline is still under active development and comes with no guarantees whatsoever. Please carefully inspect the output.
@@ -23,8 +23,8 @@ You need a Linux system with [Nextflow](https://www.nextflow.io/), [Docker](http
 
 First clone the repo and enter the directory
 ```
-git clone https://github.com/jonbra/learning_nextflow.git
-cd learning_nextflow
+git clone https://github.com/jonbra/NIPH_Virus_NGS.git
+cd NIPH_Virus_NGS
 ```
 
 Then you need to provide some parameters and store them in a file (e.g. `my_params.json`). Here's an example for HCV:
@@ -32,8 +32,8 @@ Then you need to provide some parameters and store them in a file (e.g. `my_para
 {
     "agens": "HCV",
     "//agens_comment": "",
-    "samplelist": "samplesheets/2023.04.24_HCV_from_SRA.csv",
-    "outdir": "HCV_SRA",
+    "samplelist": "samplesheets/samples.csv",
+    "outdir": "HCV",
     "spades_mode": "rnaviral",
     "kraken_all": "\/media\/jonr\/SATA6TB\/Kraken_db\/", 
     "//kraken_all_comment": "PlusPFP database compiled by Ben Langmead on 9. December 2022",
@@ -58,7 +58,7 @@ Rscript bin/create_samplesheet.R /path/to/directory/with/sub-directories/with/fa
 
 Finally run the pipeline:
 ```
-nextflow run main.nf --samplelist samplesheets/samplesheet.csv -params-file my_params.json
+nextflow run main.nf --samplelist samplesheets/samples.csv -params-file my_params.json -profile docker
 ```
 
 ## Pipeline overview
