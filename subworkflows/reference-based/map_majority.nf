@@ -16,6 +16,7 @@ process MAP_MAJORITY {
     output:
     //tuple val(sampleName), path ("${sampleName}.markdup.bam"), path ("${sampleName}.markdup.bam.bai"), optional: true, emit: markdup_out
     tuple val(sampleName), path ("${sampleName}.major.markdup.bam"), path ("${sampleName}.major.markdup.bam.bai"), optional: true, emit: majority_out
+    path "${sampleName}.major.markdup.bam"                                                                       , emit: GLUE
     path "*.log", emit: BOWTIE2_log
     path "*.{stats,sh,txt}"
 
