@@ -19,17 +19,18 @@ include { DEDUP }                 from "./modules/dedup.nf"
 include { BOWTIE2 }               from "./modules/bowtie2.nf"
 include { TANOTI }                from "./modules/tanoti.nf"
 include { HCV_GLUE_SQL }          from "./modules/hcv_glue.nf"
+include { GLUE_PARSER }           from "./modules/glue_parser.nf"
 include { CLIQUE_SNV }            from "./modules/cliquesnv.nf"
 include { HBV_RT_BLAST }          from "./modules/hbv_rt_blast.nf"
 include { HBV_RT_BLAST_PARSE }    from "./modules/hbv_rt_blast_parse.nf"
 
 if (params.reference_based) {
-  include { MAP_ONE      } from "./subworkflows/reference-based/map_one.nf"
-  include { MAP_MAJORITY      } from "./subworkflows/reference-based/map_majority.nf"
-  include { MAP_MINORITY } from "./subworkflows/reference-based/map_minority.nf"
-  include { CONSENSUS_MAJOR    } from "./subworkflows/reference-based/consensus_major.nf"
-  include { CONSENSUS_MINOR    } from "./subworkflows/reference-based/consensus_minor.nf"
-  //GLUE_REF_BASED
+  include { MAP_ONE }             from "./subworkflows/reference-based/map_one.nf"
+  include { MAP_MAJORITY }        from "./subworkflows/reference-based/map_majority.nf"
+  include { MAP_MINORITY }        from "./subworkflows/reference-based/map_minority.nf"
+  include { CONSENSUS_MAJOR }     from "./subworkflows/reference-based/consensus_major.nf"
+  include { CONSENSUS_MINOR }     from "./subworkflows/reference-based/consensus_minor.nf"
+  include { GLUE_REF_BASED }      from "./subworkflows/reference-based/glue_ref.nf"
   //SUMMARIZE_REF_BASED
 }
 
@@ -61,12 +62,15 @@ workflow {
 
   // Include the reference-based sub-workflow at this stage. Run that separately to the end
   if (params.reference_based) {
-    MAP_ONE(     TRIM.out.TRIM_out, params.blast_db, INDEX.out.INDEX_out                        ) 
-    MAP_MAJORITY(     TRIM.out.TRIM_out, params.blast_db, INDEX.out.INDEX_out, MAP_ONE.out.sorted_out)
+    MAP_ONE(TRIM.out.TRIM_out, params.blast_db, INDEX.out.INDEX_out                        ) 
+    MAP_MAJORITY(TRIM.out.TRIM_out, params.blast_db, INDEX.out.INDEX_out, MAP_ONE.out.sorted_out)
     MAP_MINORITY(TRIM.out.TRIM_out, params.blast_db, INDEX.out.INDEX_out, MAP_ONE.out.sorted_out)
-    CONSENSUS_MAJOR(   MAP_MAJORITY.out.majority_out)
-    CONSENSUS_MINOR(  MAP_MINORITY.out.minority_out)
-    //GLUE_REF_BASED(.collect)
+    CONSENSUS_MAJOR(MAP_MAJORITY.out.majority_out)
+    CONSENSUS_MINOR(MAP_MINORITY.out.minority_out)
+  
+    //ch_glue = Channel.from([MAP_MAJORITY.out.GLUE.collect(), MAP_MINORITY.out.GLUE.collect()]) Use mix?
+    ch_glue = MAP_MAJORITY.out.GLUE.collect().mix(MAP_MINORITY.out.GLUE.collect())
+    GLUE_REF_BASED(ch_glue)
     //SUMMARIZE_REF_BASED(.collect)
   }
 
@@ -84,7 +88,8 @@ workflow {
 
   // Summarize the mapping statistics for all samples
   SUMMARIZE_MAPPING(MAP_TO_GENOTYPES.out.STATS.collect(),
-                    MAP_TO_GENOTYPES.out.DEPTH.collect())
+                    MAP_TO_GENOTYPES.out.DEPTH.collect(),
+                    BLASTN.out.for_summarize.collect())
 
   // Run Genotyping for HBV
   if (params.agens == 'HBV') {
@@ -95,6 +100,7 @@ workflow {
   // Run GLUE for HCV
   if (params.glue) {
     HCV_GLUE_SQL(MAP_TO_GENOTYPES.out.GLUE.collect())
+    GLUE_PARSER(HCV_GLUE_SQL.out.GLUE_json)
   }
  // if (params.agens == 'HCV') {
  //   HCV_GLUE_SQL(MAP_TO_GENOTYPES.out.GLUE.collect())
