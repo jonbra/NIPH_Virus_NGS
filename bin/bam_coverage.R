@@ -28,6 +28,8 @@ plots <- df %>%
     ~ ggplot(.) + 
       aes(x = Position, y = Coverage) + 
       geom_line() + 
+      geom_hline(yintercept = 10, color = "darkgreen", linetype = "dotted") +
+      annotate("text", x=900, y=-150, label="Coverage cutoff = 10") +
       ggtitle(.y[[1]]) # .y contains the grouping variable. I.e. the sampleName in this case
     )
 
@@ -44,4 +46,3 @@ for(i in 1:length(plots)){
 # Write out sessionInfo() to track versions
 session <- capture.output(sessionInfo())
 write_lines(session, file = "R_versions.txt")
-
