@@ -3,17 +3,7 @@
 library(tidyverse)
 library(jsonlite)
 
-args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 2) {
-  stop("Usage: GLUE_json_parser.R <run name> <summary.csv>", call. = FALSE)
-}
-
-
-# Til Kamillas pipeline
-# Usage: GLUE_json_parser.R summary.csv
-
-json_files <- list.files(path = "GLUE-rapport_json/",
-                         pattern = "json$",
+json_files <- list.files(pattern = "json$",
                          full.names = TRUE)
 
 # Create final data file
@@ -74,9 +64,7 @@ for (x in 1:length(json_files)) {
   # Only read the proper json GLUE reports (i.e. that there was a good sequence)
   if (names(json) == "phdrReport") {
     # Sample name
-    #sample <- str_split_1(basename(json_files[x]), "\\.")[1]
-    # Kamillas script
-    sample <- unlist(strsplit(unlist(strsplit(basename(json_files[x]), "\\."))[1], "_"))[1]
+    sample <- unlist(strsplit(basename(json_files[x]), "\\."))[[1]]
     
     # Få tak i genotype
     genotype <- json[["phdrReport"]][["samReferenceResult"]][["genotypingResult"]][["genotypeCladeCategoryResult"]][["shortRenderedName"]]
@@ -221,15 +209,5 @@ for (x in 1:length(json_files)) {
   df_final <- bind_rows(df_final, df)
 }
 
-# Kamillas script: Må binde df_final til summary-fila igjen
-run_name <- args[1]
-summary <- read_tsv(args[2],
-                    col_names = TRUE,
-                    cols(.default = "c")) %>% 
-  rename("Sample" = "Parameters:")
-
-# join the data
-summary_final <- left_join(summary, df_final)
-
-write_tsv(summary_final, file = paste0(run_name, "_summary_with_glue.tsv"))
+write_tsv(df_final, file = "GLUE.tsv")
 
