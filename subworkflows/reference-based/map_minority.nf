@@ -16,6 +16,7 @@ process MAP_MINORITY {
     output:
     //tuple val(sampleName), path ("${sampleName}.markdup.bam"), path ("${sampleName}.markdup.bam.bai"), optional: true, emit: markdup_out
     tuple val(sampleName), path ("${sampleName}.minor.markdup.bam"), path ("${sampleName}.minor.markdup.bam.bai"), optional: true, emit: minority_out
+    path "${sampleName}.minor.markdup.bam"                                                                       , emit: GLUE
     path "*.log", optional: true, emit: BOWTIE2_log
     path "*.{stats,sh,txt}", optional: true
 
