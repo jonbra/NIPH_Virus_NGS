@@ -92,8 +92,9 @@ tmp_df <- left_join(tmp_df, tmp)
 blast_files <- list.files(path = path_3, pattern = "out$", full.names = TRUE)
 
 # Empty df
-df <- as.data.frame(matrix(nrow = length(files), ncol = 2))
-colnames(df) <- c("sampleName", "scaffold_length")
+df <- tribble(
+  ~"scaffold_length", ~"reference", ~"sampleName",
+  )
 
 for (i in 1:length(blast_files)) {
   
@@ -102,23 +103,26 @@ for (i in 1:length(blast_files)) {
     # Separate the genotype from the subject header
     separate(X2, into = c("genotype", NA), remove = FALSE) %>% 
     # Get scaffold length info
-    separate(X1, c(NA, NA, NA, "sc_length", NA, NA), sep = "_", remove = FALSE) %>% 
-    mutate(sc_length = as.numeric(sc_length)) %>% 
+    separate(X1, c(NA, NA, NA, "scaffold_length", NA, NA), sep = "_", remove = FALSE) %>% 
+    mutate(scaffold_length = as.numeric(scaffold_length)) %>% 
     # Select the row with the longest scaffold lengths for each genotype/blast hit
     group_by(genotype) %>% 
-    slice_max(order_by = sc_length, n = 1) %>% 
+    slice_max(order_by = scaffold_length, n = 1) %>% 
     ungroup %>% 
     # Sometimes the same scaffolds has two or more hits
     distinct(X1, .keep_all = TRUE) %>% 
-    select(sc_length,
+    select(scaffold_length,
            "reference" = X2) %>% 
     # Legg til en kolonne med Sample Name
     add_column("sampleName" = str_split(basename(blast_files[i]), "_")[[1]][1])
   
-  # Add to tmp_df
-  tmp_df <- left_join(tmp_df, blast_out)
-
+  # Add to df
+  df <- bind_rows(df, blast_out)
+  
 }
+
+# Add scaffold lengths to tmp_df
+tmp_df <- left_join(tmp_df, df)
 
 # Write file
 write_csv(tmp_df, file = "Genotype_mapping_summary_long.csv")
