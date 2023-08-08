@@ -1,4 +1,10 @@
 # NIPH_Virus_NGS
+This is the HCV branch.
+TODO:
+[] Slette databaser og referanser fra andre agens
+[] Ta bort agens option 
+[] Ta bort HBV/Rota-deler av pipelinen
+
 
 >**Warning**
 >This pipeline is still under active development and comes with no guarantees whatsoever. Please carefully inspect the output.
