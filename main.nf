@@ -44,10 +44,14 @@ workflow {
   FASTQC_TRIM(TRIM.out.TRIM_out, 'trimmed')
   KRAKEN2(TRIM.out.TRIM_out, params.kraken_all)
   KRAKEN2_FOCUSED(TRIM.out.TRIM_out, params.kraken_focused)
-  SPADES(KRAKEN2_FOCUSED.out.classified_reads_fastq)
-  BLASTN(SPADES.out.scaffolds, params.blast_db)
-  BLAST_PARSE(BLASTN.out.blastn_out)
-  MAP_TO_GENOTYPES(BLAST_PARSE.out.FOR_MAPPING)
+
+  // Only run SPADES and mapping if Kraken2 focused results in classified reads
+  if(KRAKEN2_FOCUSED.out.classified_reads_fastq.exists()) {
+    SPADES(KRAKEN2_FOCUSED.out.classified_reads_fastq)
+    BLASTN(SPADES.out.scaffolds, params.blast_db)
+    BLAST_PARSE(BLASTN.out.blastn_out)
+    MAP_TO_GENOTYPES(BLAST_PARSE.out.FOR_MAPPING)
+  }
 
   // Plot the coverage of all the genotype mappings
   PLOT_COVERAGE(MAP_TO_GENOTYPES.out.DEPTH.collect())
