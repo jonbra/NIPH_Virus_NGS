@@ -12,7 +12,7 @@ process SUBSET_KRAKEN2 {
     path kraken_out
 
     output:
-    tuple val(sampleName), path('*taxid*R1.fastq*'), path('*taxid*R2.fastq*'), emit: subset_reads_fastq
+    tuple val(sampleName), path('*taxid*R1.fastq*'), path('*taxid*R2.fastq*'), emit: subset_reads_fastq, optional: true
     path "versions.yml"                                                      , emit: versions
 
     script:
