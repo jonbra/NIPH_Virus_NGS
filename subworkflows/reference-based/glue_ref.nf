@@ -42,8 +42,9 @@ process GLUE_REF_BASED {
         -w /opt/bams \
         --link gluetools-mysql \
         cvrbioinformatics/gluetools:latest gluetools.sh \
-        --console-option cmd-result-format:json -EC \
-        --inline-cmd project hcv module phdrReportingController invoke-function reportBam \${bam} 15.0 > \${bam}.json
+         -p cmd-result-format:json \
+        -EC \
+        -i project hcv module phdrReportingController invoke-function reportBam \${bam} 15.0 > \${bam}.json
     done
     """
 }      

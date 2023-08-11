@@ -3,10 +3,10 @@ process CONSENSUS_MAJOR {
     container 'andersenlabapps/ivar'
 
     input:
-    tuple val(sampleName), path ("${sampleName}.major.markdup.bam"), path ("${sampleName}.major.markdup.bam.bai")
+    tuple val(sampleName), path (bam)
 
-    publishDir "${params.outdir}/ref-based", mode: 'copy', pattern:'*.{fa}'
-    publishDir "${params.outdir}/ref-based", mode: 'copy', pattern:'*.{sh,yml}'
+    publishDir "${params.outdir}/consensus", mode: 'copy', pattern:'*.{fa}'
+    publishDir "${params.outdir}/consensus", mode: 'copy', pattern:'*.{sh,yml}'
 
     output:
     tuple val(sampleName), path ("${sampleName}*.fa"), optional: true
@@ -14,7 +14,7 @@ process CONSENSUS_MAJOR {
 
     script:
     """
-    samtools mpileup -aa -A -d 10000 -Q 20 ${sampleName}.major.markdup.bam | ivar consensus -p ${sampleName}_major -m 5
+    samtools mpileup -aa -A -d 10000 -Q 20 ${bam} | ivar consensus -p ${sampleName}_major -m 5
 
     cp .command.sh ${sampleName}.consensus_major.sh
 

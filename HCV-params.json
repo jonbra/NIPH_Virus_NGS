@@ -1,13 +1,13 @@
 {
     "agens": "HCV",
     "//agens_comment": "",
-    "samplelist": "samplesheets/HCV_recombinant_sample.csv",
-    "outdir": "HCV_rnaviral",
+    "samplelist": "samplesheets/FHI_samples_2.csv",
+    "outdir": "FHI_samples_2",
     "spades_mode": "rnaviral",
     "kraken_all": "\/media\/jonr\/SATA6TB\/Kraken_db\/", 
     "//kraken_all_comment": "PlusPFP database compiled by Ben Langmead on 9. December 2022",
     "kraken_focused": "\/home\/jonr\/Prosjekter\/learning_nextflow\/Data\/Kraken_db\/db_hepacivirus",  
     "//kraken_focused_comment": "NCBI Hepacivirus genomes with HCV genotypes from NCBI added|",
     "blast_db": "\/home\/jonr\/Prosjekter\/learning_nextflow\/Data\/Blast_db\/HCVgenosubtypes_8.5.19_clean.fa", 
-    "//blast_db_comment": "Custom set of HCV fasta files representing different genotypes"
+    "//blast_db_comment": "Custom set of HCV fasta files representing different genotypes. 2k1b recombinant added."
 }
