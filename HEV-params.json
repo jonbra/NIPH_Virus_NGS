@@ -1,0 +1,15 @@
+{
+    "agens": "HEV",
+    "//agens_comment": "",
+    "samplelist": "samplesheets/HEV_Run866.csv",
+    "outdir": "HEV_Run866",
+    "spades_mode": "rnaviral",
+    "kraken_all": "\/media\/jonr\/SATA6TB\/Kraken_db\/", 
+    "//kraken_all_comment": "PlusPFP database compiled by Ben Langmead on 9. December 2022",
+    "kraken_focused": "\/home\/jonr\/Prosjekter\/learning_nextflow\/Data\/Kraken_db\/db_HEV\/",  
+    "//kraken_focused_comment": "HEV sequences downloaded from the GLUE website. Min. seq length 5000 and clustered on 99%. Only subtypes seqs retained",
+    "blast_db": "\/home\/jonr\/Prosjekter\/learning_nextflow\/Data\/Blast_db\/HEV_GLUE_filtered_clustered_2023.04.26.fa", 
+    "//blast_db_comment": "HEV sequences downloaded from the GLUE website. Min. seq length 5000 and clustered on 99%. Only subtypes seqs retained",
+    "rt_domain": "\/home\/jonr\/Prosjekter\/learning_nextflow\/Data\/HBV_references\/DPOL_HBVD1_RT_domain.fasta",
+    "//rt_domain_comment": "rt-domain of the polymerase. DPOL_HBVD1 in uniprot"
+}

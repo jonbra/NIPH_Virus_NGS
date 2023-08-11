@@ -1,0 +1,13 @@
+{
+    "agens": "MPX",
+    "//agens_comment": "",
+    "samplelist": "samplesheets/MPX_2023.04.03.csv",
+    "outdir": "MPX_first_test",
+    "spades_mode": "rnaviral",
+    "kraken_all": "\/media\/jonr\/SATA6TB\/Kraken_db\/", 
+    "//kraken_all_comment": "PlusPFP database compiled by Ben Langmead on 9. December 2022",
+    "kraken_focused": "\/home\/jonr\/Prosjekter\/learning_nextflow\/Data\/Kraken_db\/db_MPX",  
+    "//kraken_focused_comment": "Two MPX reference genomes downloaded from NCBI April 03 2023",
+    "blast_db": "\/home\/jonr\/Prosjekter\/learning_nextflow\/Data\/Blast_db\/MPX_database.fa", 
+    "//blast_db_comment": "MPX genomes received through the UNSGM 2023 exercise"
+}
