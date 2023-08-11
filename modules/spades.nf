@@ -18,7 +18,7 @@ process SPADES {
     tuple val(sampleName), path(read1), path(read2)
 
     output:
-    tuple val(sampleName), path("${sampleName}.scaffolds.fa"), path(read1), path(read2), emit: scaffolds
+    tuple val(sampleName), path("${sampleName}.scaffolds.fa"), path(read1), path(read2), emit: scaffolds, optional: true
     path('*.log')    
     path "spades_versions.yml"   
     path "${sampleName}.spades_command.sh"   
