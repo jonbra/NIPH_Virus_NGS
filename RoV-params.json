@@ -1,8 +1,8 @@
 {
     "agens": "ROV",
     "//agens_comment": "",
-    "samplelist": "samplesheets/RoV_Run845_samplesheet.csv",
-    "outdir": "ROV_Run845",
+    "samplelist": "samplesheets/RoV_Run875_samplesheet.csv",
+    "outdir": "ROV_Run875",
     "spades_mode": "rnaviral",
     "kraken_all": "\/media\/jonr\/SATA6TB\/Kraken_db\/", 
     "//kraken_all_comment": "PlusPFP database compiled by Ben Langmead on 9. December 2022",
