@@ -1,5 +1,10 @@
 # NIPH_Virus_NGS
 
+# TODO:
+# Kjøre en DEDUP etter Fastqc?
+# Add a de novo assembly and blast step. Including blast parse and mapping to nearest references. Add the results to the summary for comparison.
+# This is especially useful for evaluating potential minor variants.
+
 >**Warning**
 >This pipeline is still under active development and comes with no guarantees whatsoever. Please carefully inspect the output.
 
