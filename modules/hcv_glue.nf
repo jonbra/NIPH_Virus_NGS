@@ -1,4 +1,4 @@
-process HCV_GLUE_SQL {
+process HCV_GLUE {
 
     publishDir "${params.outdir}/glue", mode:'copy', pattern: '*.{json}'
 
