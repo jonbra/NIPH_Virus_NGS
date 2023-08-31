@@ -13,9 +13,9 @@ df <- list.files(path = "plots/", pattern = "gz", full.names = TRUE) %>%
   # Clean up sampleName
   mutate(sampleName = str_remove(sampleName, "plots//")) %>% 
   # Split on the first "."
-  separate(sampleName, into = c("sampleName"), sep = "\\.") %>% 
+  separate(sampleName, into = c("sampleName", "major_minor"), sep = "\\.") %>% 
   # Create a new column that joints the sampleName and reference name
-  unite("Plot_name", c("sampleName", "X1"), sep = ".", remove = FALSE) %>% 
+  unite("Plot_name", c("sampleName", "major_minor", "X1"), sep = ".", remove = FALSE) %>% 
   # Rename columns
   rename("Genotype" = X1,
          "Position" = X2,
