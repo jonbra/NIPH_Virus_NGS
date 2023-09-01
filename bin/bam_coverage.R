@@ -2,46 +2,37 @@
 
 library(tidyverse)
 
-# Read a list of input files into a list
-df <- list.files(path = "plots/", pattern = "gz", full.names = TRUE) %>%
-  # Keep the file names as the names of the list elements
-  set_names() %>% 
-  map(read_tsv, col_names = FALSE) %>% 
-  # Reduce the list to a single dataframe. Keep the filenames (list element names) in column 1
-  # The column name will be "sampleName"
-  bind_rows(.id = "sampleName") %>% 
-  # Clean up sampleName
-  mutate(sampleName = str_remove(sampleName, "plots//")) %>% 
-  # Split on the first "."
-  separate(sampleName, into = c("sampleName", "major_minor"), sep = "\\.") %>% 
-  # Create a new column that joints the sampleName and reference name
-  unite("Plot_name", c("sampleName", "major_minor", "X1"), sep = ".", remove = FALSE) %>% 
+args = commandArgs(trailingOnly=TRUE)
+if (length(args) < 1) {
+  stop("Usage: bam_coverage.R <depth file>", call.=FALSE)
+}
+
+depth <- args[1]
+sampleName <- unlist(str_split(basename(depth), pattern = "\\."))[1]
+major_minor <- unlist(str_split(basename(depth), pattern = "\\."))[2]
+
+df <- read_tsv(depth, col_names = FALSE) %>% 
   # Rename columns
-  rename("Genotype" = X1,
+  rename("Reference" = X1,
          "Position" = X2,
          "Coverage" = X3)
 
+# Get the mapped reference
+reference <- df %>% distinct(Reference) %>% pull(Reference)
 
-plots <- df %>% 
-  group_by(Plot_name) %>% 
-  group_map(
-    ~ ggplot(.) + 
-      aes(x = Position, y = Coverage) + 
-      geom_line() + 
-      geom_hline(yintercept = 10, color = "darkgreen", linetype = "dotted") +
-      annotate("text", x=900, y=-150, label="Coverage cutoff = 10") +
-      ggtitle(.y[[1]]) # .y contains the grouping variable. I.e. the sampleName in this case
-    )
+plot <- df %>% 
+    ggplot() +
+    aes(x = Position, y = Coverage) + 
+    geom_line() +
+    geom_hline(yintercept = 10, color = "darkgreen", linetype = "dotted") +
+    annotate("text", x=900, y=-150, label="Coverage cutoff = 10") +
+    ggtitle(paste0(sampleName, ".", major_minor, ".", reference))
 
-# Save the plots
-for(i in 1:length(plots)){
-  ggsave(plot = plots[[i]], 
-         file = paste0((df %>% distinct(Plot_name) %>% pull(Plot_name))[i], # This pulls the ith element of the sampleNames from df
-                       i, 
-                       ".png"), 
+# Save the plot
+ggsave(plot = plot, 
+       file = paste0(sampleName, ".", major_minor, ".", reference, ".png"), 
          device = "png", 
          dpi = 300)
-}
 
 # Write out sessionInfo() to track versions
 session <- capture.output(sessionInfo())
