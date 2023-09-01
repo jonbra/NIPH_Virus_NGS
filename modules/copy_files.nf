@@ -8,10 +8,11 @@ process COPY_FILES {
 
     input:
     path(samplelist)
+    path(outdir)
     //path(parameter_file)
 
     script:
     """
-    cp ${samplelist} ${params.outdir}/
+    cp ${samplelist} "$baseDir/${outdir}"
     """
 }
