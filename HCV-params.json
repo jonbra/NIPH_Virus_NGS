@@ -1,8 +1,8 @@
 {
     "agens": "HCV",
     "//agens_comment": "",
-    "samplelist": "samplesheets/HCV_Run882.csv",
-    "outdir": "HCV_Run882",
+    "samplelist": "samplesheets/HCV_Run882_copy_copy.csv",
+    "outdir": "HCV_Run882_dev_copy",
     "mapper": "tanoti",
     "//mapper_comment": "Parameter can be either: tanoti or bowtie2",
     "tanoti_stringency_1": "85",
