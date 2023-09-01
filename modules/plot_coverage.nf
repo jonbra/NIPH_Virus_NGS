@@ -11,7 +11,7 @@ process PLOT_COVERAGE {
     publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.txt'
 
     input:
-    path 'plots/'
+    path(depth)
 
     output:
     path '*png', emit: coverage_plots
@@ -20,7 +20,7 @@ process PLOT_COVERAGE {
 
     script:
     """
-    bam_coverage.R
+    bam_coverage.R "$depth"
 
     cp .command.log plot_coverage_command.log
     cp .command.sh plot_coverage_command.sh
