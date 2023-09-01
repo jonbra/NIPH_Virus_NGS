@@ -8,13 +8,14 @@ process MAP_MAJORITY_TANOTI {
     tuple val(sampleName), path(read1), path(read2)
     path references
     tuple val(sampleName), path ("${sampleName}.first_mapping.sorted.bam"), path ("${sampleName}.first_mapping.sorted.bam.bai")
+    path(major_ref)
 
     publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*major*.{bam,bai}'
     publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*.{stats,log,sh,txt,yml}'
 
     output:
     tuple val(sampleName), path ("${sampleName}.major.markdup.bam"), path ("${sampleName}.major.markdup.bam.bai"), optional: true, emit: majority_out
-    path "${sampleName}.major.markdup.bam"                                                                       , optional: true, emit: GLUE
+    tuple val(sampleName), path ("${sampleName}.major.markdup.bam")                                              , optional: true, emit: GLUE
     path "*.gz"                                                                                                  , optional: true, emit: DEPTH
     path "${sampleName}.major.markdup.bam.stats"                                                                 , optional: true, emit: STATS
     path "*.log"                                                                                                 , optional: true, emit: BOWTIE2_log
@@ -23,8 +24,10 @@ process MAP_MAJORITY_TANOTI {
     script:
     """
     # Re-map against the reference with the most mapped reads
-    major="\$(samtools idxstats ${sampleName}.first_mapping.sorted.bam | cut -f 1,3 | sort -k2 -h | tail -1 | cut -f1)" # Reference with most reads
-    echo "\${major}" >> ${sampleName}.majority_mapping_MAPPING_info.txt
+    major="\$(< ${major_ref})"
+
+    #major="\$(samtools idxstats ${sampleName}.first_mapping.sorted.bam | cut -f 1,3 | sort -k2 -h | tail -1 | cut -f1)" # Reference with most reads
+    #echo "\${major}" >> ${sampleName}.majority_mapping_MAPPING_info.txt
     samtools faidx ${references} "\${major}" > "\${major}".fa # Get the fasta sequence
 
     tanoti \
