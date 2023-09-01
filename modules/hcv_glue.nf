@@ -1,18 +1,24 @@
 process HCV_GLUE {
 
+    errorStrategy 'ignore'
+
     publishDir "${params.outdir}/glue", mode:'copy', pattern: '*.{json}'
 
     input:
-    path 'bams/'
+    tuple val(sampleName), path (bam)
 
     output:
-    path "*.json", emit: GLUE_json
+    path "*.json", optional: true, emit: GLUE_json
 
     script:
     """
-    # Copy bam files from bams/ directory so they are not present in work directory as links.
+    # Create variable to hold the bam file name
+    #bam=\$(ls *markdup.bam)
+
+    # Copy bam file from current directory to a bam/ directory so they are not present in work directory as links.
     # This is for mounting to the docker image later
-    cp bams/*.bam .
+    #mkdir bams
+    cp ${bam} glue_${bam}
     
     # Pull the latest image
     docker pull cvrbioinformatics/gluetools-mysql:latest
@@ -22,11 +28,6 @@ process HCV_GLUE {
     docker start gluetools-mysql 
     docker exec gluetools-mysql installGlueProject.sh ncbi_hcv_glue
 
-    # Make a for loop over all consensus-sequences
-
-    for bam in \$(ls *.bam)
-    do
-   
     docker run --rm \
        --name gluetools \
         -v \$PWD:/opt/bams \
@@ -35,7 +36,6 @@ process HCV_GLUE {
         cvrbioinformatics/gluetools:latest gluetools.sh \
          -p cmd-result-format:json \
         -EC \
-        -i project hcv module phdrReportingController invoke-function reportBam \${bam} 15.0 > \${bam}.json
-    done
+        -i project hcv module phdrReportingController invoke-function reportBam glue_${bam} 15.0 > ${bam}.json
     """
 }      
