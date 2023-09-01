@@ -25,7 +25,7 @@ include { MAP_MAJORITY_BOWTIE2 }        from "./modules/map_majority_bowtie2.nf"
 include { MAP_MINORITY_TANOTI }        from "./modules/map_minority_tanoti.nf"
 include { MAP_MINORITY_BOWTIE2 }        from "./modules/map_minority_bowtie2.nf"
 include { IDENTIFY_MAJOR_MINOR }    from "./modules/identify_major_minor.nf"
-include { COPY_FILES }            from "./modules/copy_files.nf"
+//include { COPY_FILES }            from "./modules/copy_files.nf"
 //include { CONSENSUS_MAJOR }     from "./modules/consensus_major.nf"
 //include { CONSENSUS_MINOR }     from "./modules/consensus_minor.nf"
 //include { GLUE_REF_BASED }      from "./modules/glue_ref.nf"
@@ -45,8 +45,8 @@ workflow {
               .map{ row -> tuple(row.sample, file(row.fastq_1), file(row.fastq_2))}
       
       // Make a copy of the samplelist and params-file in the result folder
-      COPY_FILES(params.samplelist)
-      //file(params.samplelist).copyTo("${params.outdir}/${params.samplelist}")
+      //COPY_FILES(Channel.fromPath(params.samplelist), params.outdir)
+      file(params.samplelist).copyTo("${params.outdir}/${params.samplelist}")
       //file(params.params-file).copyTo("${params.outdir}/${params.params-file}")
   }
 
