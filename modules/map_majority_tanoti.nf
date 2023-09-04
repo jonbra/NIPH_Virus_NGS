@@ -8,7 +8,7 @@ process MAP_MAJORITY_TANOTI {
     tuple val(sampleName), path(read1), path(read2)
     path references
     tuple val(sampleName), path ("${sampleName}.first_mapping.sorted.bam"), path ("${sampleName}.first_mapping.sorted.bam.bai")
-    path(major_ref)
+    tuple val(sampleName), path(major_ref)
 
     publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*major*.{bam,bai}'
     publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*.{stats,log,sh,txt,yml}'
@@ -16,7 +16,7 @@ process MAP_MAJORITY_TANOTI {
     output:
     tuple val(sampleName), path ("${sampleName}.major.markdup.bam"), path ("${sampleName}.major.markdup.bam.bai"), optional: true, emit: majority_out
     tuple val(sampleName), path ("${sampleName}.major.markdup.bam")                                              , optional: true, emit: GLUE
-    path "*.gz"                                                                                                  , optional: true, emit: DEPTH
+    tuple val(sampleName), path ("${sampleName}.major.markdup.bam_coverage.txt.gz")                              , optional: true, emit: DEPTH
     path "${sampleName}.major.markdup.bam.stats"                                                                 , optional: true, emit: STATS
     path "*.log"                                                                                                 , optional: true, emit: BOWTIE2_log
     path "*.{stats,sh,txt}"                                                                                      , optional: true
