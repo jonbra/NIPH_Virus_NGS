@@ -15,7 +15,9 @@ process MAP_ALL_REFERENCES {
     tuple val(sampleName), path ("${sampleName}.first_mapping.sorted.bam"), path ("${sampleName}.first_mapping.sorted.bam.bai"), optional: true, emit: sorted_out
     path "*.log"                                                                                                               , optional: true, emit: BOWTIE_log
     tuple val(sampleName), path("${sampleName}.first_mapping.sorted.bam.idxstats")                                             , optional: true, emit: idxstats
-    path "*.{stats,sh,txt}"                                                                                                    , optional: true
+    tuple val(sampleName), path("${sampleName}.first_mapping.sorted.bam.stats")                                                , optional: true, emit: stats
+    tuple val(sampleName), path("${sampleName}.first_mapping.sorted.bam_coverage.txt.gz")                                      , optional: true, emit: DEPTH
+    path "*.{sh,txt}"                                                                                                          , optional: true
 
     script:
     """
@@ -38,6 +40,9 @@ process MAP_ALL_REFERENCES {
 
     SEQ=\$(grep 'reads mapped:' ${sampleName}.first_mapping.sorted.bam.stats| cut -f3)
     echo \${SEQ} > ${sampleName}.first_mapping_MAPPING_info.txt
+
+    # Creating file with coverage per site for plotting later
+    samtools depth -aa -d 1000000 ${sampleName}.first_mapping.sorted.bam | gzip > ${sampleName}.first_mapping.sorted.bam_coverage.txt.gz
 
     # Summarize reads mapped per reference
     samtools idxstats ${sampleName}.first_mapping.sorted.bam > ${sampleName}.first_mapping.sorted.bam.idxstats
