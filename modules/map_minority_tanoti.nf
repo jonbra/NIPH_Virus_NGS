@@ -8,7 +8,7 @@ process MAP_MINORITY_TANOTI {
     tuple val(sampleName), path(read1), path(read2)
     path references
     tuple val(sampleName), path ("${sampleName}.first_mapping.sorted.bam"), path ("${sampleName}.first_mapping.sorted.bam.bai")
-    path(minor_ref)
+    tuple val(sampleName), path(minor_ref)
 
     publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*minor*.{bam,bai}'
     publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*.{stats,log,sh,txt,yml}'
@@ -16,22 +16,26 @@ process MAP_MINORITY_TANOTI {
     output:
     tuple val(sampleName), path ("${sampleName}.minor.markdup.bam"), path ("${sampleName}.minor.markdup.bam.bai"), optional: true, emit: minority_out
     tuple val(sampleName), path ("${sampleName}.minor.markdup.bam")                                              , optional: true, emit: GLUE
-    path "*.gz"                                                                                                  , optional: true, emit: DEPTH
+    tuple val(sampleName), path ("${sampleName}.minor.markdup.bam_coverage.txt.gz")                              , optional: true, emit: DEPTH
     path "${sampleName}.minor.markdup.bam.stats"                                                                 , optional: true, emit: STATS
     path "*.log"                                                                                                 , optional: true, emit: BOWTIE2_log
     path "*.{stats,sh,txt}"                                                                                      , optional: true
 
     script:
     """
-    # Map reads against the subtype with the second most mapped reads, regardless of the number of reads or coverage. 
-    minor="\$(< ${minor_ref})"
+    # Map reads against the subtype with the second most mapped reads
+    minor="\$(cat ${minor_ref} | head -1)"
+    reads="\$(cat ${minor_ref} | head -2 | tail -1)"
+    cov="\$(cat ${minor_ref} | tail -1)"
 
     # Getting the reference with the second most mapped reads
     #minor="\$(samtools idxstats ${sampleName}.first_mapping.sorted.bam | cut -f 1,3 | sort -k2 -h | tail -2 | head -1 | cut -f1)" # Reference with second most reads
     #echo "\${minor}" >> ${sampleName}.minority_mapping_MAPPING_info.txt
-    samtools faidx ${references} "\${minor}" > "\${minor}".fa # Get the fasta sequence
 
+    # Map to the minor reference if it had more than minAgensRead reads and more than 5x coverage (min coverage threshold of 5) in the firs mapping
+    if [ "\${reads}" -t ${params.minAgensRead} ] && [ "\${cov}" -gt 5 ]; then 
 
+    samtools faidx ${references} "\${minor}" > "\${minor}".fa # Get the fasta sequence of the minor reference
 
     tanoti \
         -r "\${minor}.fa" \
@@ -61,6 +65,8 @@ process MAP_MINORITY_TANOTI {
 
     SEQ3=\$(grep 'reads mapped:' ${sampleName}.minor.markdup.bam.stats | cut -f3)
     echo \${SEQ3} >> ${sampleName}.minority_mapping_MAPPING_info.txt
+
+    fi
 
     cp .command.sh ${sampleName}.tanoti.minority_mapping.sh
 
