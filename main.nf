@@ -7,6 +7,9 @@ include { FASTQC as FASTQC_TRIM } from "./modules/fastqc.nf"
 include { KRAKEN2_FOCUSED }       from "./modules/kraken2_focused.nf"
 //include { INDEX }                 from "./modules/index.nf"
 include { MULTIQC }               from "./modules/multiqc.nf"
+include { SPADES }               from "./modules/spades.nf"
+include { BLASTN }                from "./modules/blastn.nf"
+include { BLAST_PARSE }           from "./modules/blast_parse.nf"
 include { MAP_TO_GENOTYPES }      from "./modules/map_to_genotypes.nf"
 include { PLOT_COVERAGE as PLOT_COVERAGE_MAJOR}         from "./modules/plot_coverage.nf"
 include { PLOT_COVERAGE as PLOT_COVERAGE_MINOR }         from "./modules/plot_coverage.nf"
@@ -58,12 +61,18 @@ workflow {
   //KRAKEN2(TRIM.out.TRIM_out, params.kraken_all)
   KRAKEN2_FOCUSED(TRIM.out.TRIM_out, params.kraken_focused)
 
+  // Run de novo assembly of the classified reads and identify the neares references in the Blast database
+  SPADES(KRAKEN2_FOCUSED.out.classified_reads_fastq)
+  BLASTN(SPADES.out.scaffolds, params.blast_db)
+  BLAST_PARSE(BLASTN.out.blastn_out)
+
   // Map reads to all references using Bowtie2
   MAP_ALL_REFERENCES(KRAKEN2_FOCUSED.out.classified_reads_fastq, params.blast_db) 
 
   // Summarize the mapping and identify major and minor subtypes
-  IDENTIFY_MAJOR_MINOR(MAP_ALL_REFERENCES.out.idxstats)
+  IDENTIFY_MAJOR_MINOR(MAP_ALL_REFERENCES.out.idxstats, MAP_ALL_REFERENCES.out.DEPTH)
 
+  // Map reads to the most abundant subtype, and a possible minor subtype
   if (params.mapper == "tanoti") {
       MAP_MAJORITY_TANOTI(KRAKEN2_FOCUSED.out.classified_reads_fastq, params.blast_db, MAP_ALL_REFERENCES.out.sorted_out, IDENTIFY_MAJOR_MINOR.out.major_ref)
       MAP_MINORITY_TANOTI(KRAKEN2_FOCUSED.out.classified_reads_fastq, params.blast_db, MAP_ALL_REFERENCES.out.sorted_out, IDENTIFY_MAJOR_MINOR.out.minor_ref)
@@ -83,9 +92,9 @@ workflow {
       ch_stats = MAP_MAJORITY_BOWTIE2.out.STATS.collect().mix(MAP_MINORITY_BOWTIE2.out.STATS.collect())
   }
 
+  // Run GLUE analysis
   HCV_GLUE_MAJOR(ch_glue_major)
   HCV_GLUE_MINOR(ch_glue_minor)
-  //SUMMARIZE_REF_BASED(.collect)
   
   // Plot the coverage of all the genotype mappings
   PLOT_COVERAGE_MAJOR(ch_depth_major)
