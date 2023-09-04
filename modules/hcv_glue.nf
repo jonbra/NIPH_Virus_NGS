@@ -2,7 +2,7 @@ process HCV_GLUE {
 
     errorStrategy 'ignore'
 
-    publishDir "${params.outdir}/glue", mode:'copy', pattern: '*.{json}'
+    publishDir "${params.outdir}/10_glue", mode:'copy', pattern: '*.{json}'
 
     input:
     tuple val(sampleName), path (bam)
