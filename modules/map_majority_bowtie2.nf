@@ -7,9 +7,9 @@ process MAP_MAJORITY_BOWTIE2 {
     input:
     tuple val(sampleName), path(read1), path(read2)
     path genome
-    path genome_index
     tuple val(sampleName), path ("${sampleName}.first_mapping.sorted.bam"), path ("${sampleName}.first_mapping.sorted.bam.bai")
-
+    tuple val(sampleName), path(major_ref)
+    
     publishDir "${params.outdir}/ref-based", mode: 'copy', pattern:'*major*.{bam,bai}'
     publishDir "${params.outdir}/ref-based", mode: 'copy', pattern:'*.{stats,log,sh,txt,yml}'
 
