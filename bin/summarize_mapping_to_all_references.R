@@ -3,12 +3,13 @@
 library(tidyverse)
 
 args = commandArgs(trailingOnly=TRUE)
-if (length(args) < 1) {
-  stop("Usage: summarize_mapping_to_all_references.R <idxstats file>", call.=FALSE)
+if (length(args) < 3) {
+  stop("Usage: summarize_mapping_to_all_references.R <idxstats file> <depth file> <sample name>", call.=FALSE)
 }
 
 idxstats   <- args[1]
-sampleName <- args[2]
+depth      <- args[2]
+sampleName <- args[3]
 
 # Read the summary of the first mapping
 df <- read_tsv(idxstats, col_names = FALSE) %>% 
@@ -21,6 +22,7 @@ summary <- df %>%
   summarise(reads = sum(X3)) %>% 
   arrange(desc(reads))
 
+## Major
 # Find major reference to use
 major_tmp <- summary$Subtype[1] 
 major_ref <- df %>% 
@@ -30,6 +32,7 @@ major_ref <- df %>%
   head(n = 1) %>% 
   pull(X1)
 
+## Minor
 minor_tmp <- summary$Subtype[2] 
 minor_ref <- df %>% 
   filter(Subtype == minor_tmp) %>% 
@@ -37,10 +40,33 @@ minor_ref <- df %>%
   arrange(desc(X3)) %>% 
   head(n = 1) %>% 
   pull(X1)
-  
+
+# How many reads mapped to the minor subtype
+minor_reads <- summary %>% 
+  filter(Subtype == minor_tmp) %>% 
+  pull(reads)
+
+# Read the depth file from the first mapping
+cov <- read_tsv(depth, col_names = FALSE) %>% 
+  # Filter out the minority subtype
+  filter(X1 == minor_ref) 
+
+# Reference length
+ref_length <- nrow(cov)
+
+# Calculate percentage of positions with a coverage of 5 or more
+# Nr. of positions with coverage >= 5
+pos <- nrow(
+  cov %>% 
+    filter(X3 > 4)
+)
+
+# Coverage breadth
+breadth <- round(pos / ref_length * 100, digits = 2)
+
 # Write files
-write_lines(major_ref, file = paste0(sampleName, ".major_ref.txt"))
-write_lines(minor_ref, file = paste0(sampleName, ".minor_ref.txt"))
+write_lines(major_ref                         , file = paste0(sampleName, ".major_ref.txt"))
+write_lines(c(minor_ref, minor_reads, breadth), file = paste0(sampleName, ".minor_ref.txt"))
 
 # Write out sessionInfo() to track versions
 session <- capture.output(sessionInfo())
