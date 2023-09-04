@@ -1,8 +1,10 @@
 {
     "agens": "HCV",
     "//agens_comment": "",
-    "samplelist": "samplesheets/HCV_Run882_copy_copy.csv",
-    "outdir": "HCV_Run882_dev_copy",
+    "samplelist": "samplesheets/HCV_Run882_copy.csv",
+    "outdir": "HCV_Run882_copy",
+    "parameter_file": "HCV-params.json",
+    "//parameter_file_comment": "The name of this file. Used for copying inside the workflow",
     "spades_mode": "rnaviral",
     "mapper": "tanoti",
     "//mapper_comment": "Parameter can be either: tanoti or bowtie2",
