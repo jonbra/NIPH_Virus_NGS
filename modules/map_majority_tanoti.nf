@@ -14,12 +14,12 @@ process MAP_MAJORITY_TANOTI {
     publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*.{stats,log,sh,txt,yml}'
 
     output:
-    tuple val(sampleName), path ("${sampleName}.major.markdup.bam"), path ("${sampleName}.major.markdup.bam.bai"), optional: true, emit: majority_out
-    tuple val(sampleName), path ("${sampleName}.major.markdup.bam")                                              , optional: true, emit: GLUE
-    tuple val(sampleName), path ("${sampleName}.major.markdup.bam_coverage.txt.gz")                              , optional: true, emit: DEPTH
-    path "${sampleName}.major.markdup.bam.stats"                                                                 , optional: true, emit: STATS
-    path "*.log"                                                                                                 , optional: true, emit: BOWTIE2_log
-    path "*.{stats,sh,txt}"                                                                                      , optional: true
+    tuple val(sampleName), path ("${sampleName}.*.major.markdup.bam"), path ("${sampleName}.*.major.markdup.bam.bai"), optional: true, emit: majority_out
+    tuple val(sampleName), path ("${sampleName}.*.major.markdup.bam")                                                , optional: true, emit: GLUE
+    path "${sampleName}.*.major.markdup.bam_coverage.txt.gz"                                                         , optional: true, emit: DEPTH
+    path "${sampleName}.*.major.markdup.bam.stats"                                                                   , optional: true, emit: STATS
+    path "*.log"                                                                                                     , optional: true, emit: BOWTIE2_log
+    path "*.{stats,sh,txt}"                                                                                          , optional: true
 
     script:
     """
@@ -47,16 +47,16 @@ process MAP_MAJORITY_TANOTI {
     samtools sort -n ${sampleName}.majority_mapping.sorted.bam \
       | samtools fixmate -m - - \
       | samtools sort -O BAM \
-      | samtools markdup --no-PG -r - ${sampleName}.major.markdup.bam
+      | samtools markdup --no-PG -r - ${sampleName}.\${major}.major.markdup.bam
 
-    samtools index ${sampleName}.major.markdup.bam
+    samtools index ${sampleName}.\${major}.major.markdup.bam
 
-    samtools stats ${sampleName}.major.markdup.bam > ${sampleName}.major.markdup.bam.stats
+    samtools stats ${sampleName}.\${major}.major.markdup.bam > ${sampleName}.\${major}.major.markdup.bam.stats
     
     # Creating file with coverage per site for plotting later
-    samtools depth -aa -d 1000000 ${sampleName}.major.markdup.bam | gzip > ${sampleName}.major.markdup.bam_coverage.txt.gz
+    samtools depth -aa -d 1000000 ${sampleName}.\${major}.major.markdup.bam | gzip > ${sampleName}.\${major}.major.markdup.bam_coverage.txt.gz
 
-    SEQ3=\$(grep 'reads mapped:' ${sampleName}.major.markdup.bam.stats | cut -f3)
+    SEQ3=\$(grep 'reads mapped:' ${sampleName}.\${major}.major.markdup.bam.stats | cut -f3)
     echo \${SEQ3} >> ${sampleName}.majority_mapping_MAPPING_info.txt
 
     cp .command.sh ${sampleName}.tanoti.majority_mapping.sh
