@@ -11,7 +11,7 @@ process PLOT_COVERAGE {
     publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.txt'
 
     input:
-    tuple val(sampleName), path(depth)
+    path(depth)
 
     output:
     path '*png', emit: coverage_plots
