@@ -9,7 +9,7 @@ if (length(args) < 1) {
 
 depth <- args[1]
 sampleName <- unlist(str_split(basename(depth), pattern = "\\."))[1]
-major_minor <- unlist(str_split(basename(depth), pattern = "\\."))[2]
+major_minor <- unlist(str_split(basename(depth), pattern = "\\."))[3]
 
 df <- read_tsv(depth, col_names = FALSE) %>% 
   # Rename columns
