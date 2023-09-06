@@ -24,16 +24,18 @@ process MAP_MINORITY_TANOTI {
     script:
     """
     # Map reads against the subtype with the second most mapped reads
-    minor="\$(cat ${minor_ref} | head -1)"
-    reads="\$(cat ${minor_ref} | head -2 | tail -1)"
-    cov="\$(cat ${minor_ref} | tail -1)"
+    minor="\$(cat ${minor_ref} | head -1)" # Getting the subtype with the second most mapped reads
+    reads="\$(cat ${minor_ref} | head -2 | tail -1)" # How many reads mapped to this subtype in the first mapping. After duplicate removal
+    cov="\$(cat ${minor_ref} | tail -1)" # The coverage of this subtype in the first mapping. After duplicate removal. Depth cutoff of 5 or more.
 
-    # Getting the reference with the second most mapped reads
-    #minor="\$(samtools idxstats ${sampleName}.first_mapping.sorted.bam | cut -f 1,3 | sort -k2 -h | tail -2 | head -1 | cut -f1)" # Reference with second most reads
-    #echo "\${minor}" >> ${sampleName}.minority_mapping_MAPPING_info.txt
+    # Write info to file
+    echo "\${minor}" >> ${sampleName}.minority_mapping_MAPPING_info.txt
+    echo "\${reads}" >> ${sampleName}.minority_mapping_MAPPING_info.txt
+    echo "\${cov}" >> ${sampleName}.minority_mapping_MAPPING_info.txt
 
-    # Map to the minor reference if it had more than minAgensRead reads and more than 5x coverage (min coverage threshold of 5) in the firs mapping
-    if [ "\${reads}" -t ${params.minAgensRead} ] && [ "\${cov}" -gt 5 ]; then 
+    # Map to the minor reference if it had more than minAgensRead reads and more than 5x coverage (min coverage threshold of 5) in the first mapping
+    # Variables are wrapped in \$(()) to make them numbers and not characters
+    if [ \$(("\${reads}")) -gt \$((${params.minAgensRead})) ] && [ \$(("\${cov}")) -gt \$((50)) ]; then 
 
     samtools faidx ${references} "\${minor}" > "\${minor}".fa # Get the fasta sequence of the minor reference
 
