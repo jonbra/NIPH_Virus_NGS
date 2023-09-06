@@ -10,15 +10,15 @@ process GLUE_PARSER {
     publishDir "${params.outdir}/logs/"       , mode:'copy', pattern:'*.{log,sh}'
 
     input:
-    path '*.json'
+    path (json)
 
     output:
-    path '*tsv', emit: GLUE_summary
+    path '*tsv', optional:true, emit: GLUE_summary
     path '*{log,sh}'
 
     script:
     """
-    GLUE_json_parser.R
+    GLUE_json_parser.R ${json}
 
     cp .command.log glue_parser_command.log
     cp .command.sh glue_parser_command.sh
