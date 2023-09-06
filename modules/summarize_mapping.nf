@@ -14,6 +14,7 @@ process SUMMARIZE_MAPPING {
     path 'stats/'
     path 'depth/'
     path 'blast/'
+    path 'json/'
 
     output:
     path '*csv', emit: mapping_summary
