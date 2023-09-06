@@ -61,12 +61,13 @@ pos <- nrow(
     filter(X3 > 4)
 )
 
-# Coverage breadth
+# Coverage breadth. Convert to integer to be used in a bash if statement later
 breadth <- round(pos / ref_length * 100, digits = 2)
+breadth_int <- as.integer(pos / ref_length * 100)
 
 # Write files
 write_lines(major_ref                         , file = paste0(sampleName, ".major_ref.txt"))
-write_lines(c(minor_ref, minor_reads, breadth), file = paste0(sampleName, ".minor_ref.txt"))
+write_lines(c(minor_ref, minor_reads, breadth_int, breadth), file = paste0(sampleName, ".minor_ref.txt"))
 
 # Write out sessionInfo() to track versions
 session <- capture.output(sessionInfo())
