@@ -26,7 +26,7 @@ process MAP_MINORITY_TANOTI {
     # Map reads against the subtype with the second most mapped reads
     minor="\$(cat ${minor_ref} | head -1)" # Getting the subtype with the second most mapped reads
     reads="\$(cat ${minor_ref} | head -2 | tail -1)" # How many reads mapped to this subtype in the first mapping. After duplicate removal
-    cov="\$(cat ${minor_ref} | tail -1)" # The coverage of this subtype in the first mapping. After duplicate removal. Depth cutoff of 5 or more.
+    cov="\$(cat ${minor_ref} | head -3 | tail -1)" # The coverage of this subtype in the first mapping. After duplicate removal. Depth cutoff of 5 or more.
 
     # Write info to file
     echo "\${minor}" >> ${sampleName}.minority_mapping_MAPPING_info.txt
