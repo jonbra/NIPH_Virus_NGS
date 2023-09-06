@@ -18,7 +18,6 @@ include { BOWTIE2 }               from "./modules/bowtie2.nf"
 include { TANOTI }                from "./modules/tanoti.nf"
 include { HCV_GLUE as HCV_GLUE_MAJOR}          from "./modules/hcv_glue.nf"
 include { HCV_GLUE as HCV_GLUE_MINOR} from "./modules/hcv_glue.nf"
-include { GLUE_PARSER }           from "./modules/glue_parser.nf"
 include { MAP_ALL_REFERENCES}             from "./modules/map_all_references.nf"
 include { MAP_MAJORITY_TANOTI }        from "./modules/map_majority_tanoti.nf"
 include { MAP_MAJORITY_BOWTIE2 }        from "./modules/map_majority_bowtie2.nf"
@@ -28,6 +27,8 @@ include { IDENTIFY_MAJOR_MINOR }    from "./modules/identify_major_minor.nf"
 //include { CONSENSUS_MAJOR }     from "./modules/consensus_major.nf"
 //include { CONSENSUS_MINOR }     from "./modules/consensus_minor.nf"
 include { SUMMARIZE_MAPPING }     from "./modules/summarize_mapping.nf"
+include { GLUE_PARSER as HCV_GLUE_PARSER_MAJOR}          from "./modules/glue_parser.nf" 
+include { GLUE_PARSER as HCV_GLUE_PARSER_MINOR}          from "./modules/glue_parser.nf" 
 
 workflow {
 
@@ -89,11 +90,16 @@ workflow {
 
   // Run GLUE analysis
   HCV_GLUE_MAJOR(ch_glue_major)
+  HCV_GLUE_PARSER_MAJOR(HCV_GLUE_MAJOR.out.GLUE_json)
   HCV_GLUE_MINOR(ch_glue_minor)
+  HCV_GLUE_PARSER_MINOR(HCV_GLUE_MINOR.out.GLUE_json)
   
   // Plot the coverage of all the genotype mappings
   PLOT_COVERAGE_MAJOR(ch_depth_major)
   PLOT_COVERAGE_MINOR(ch_depth_minor)
+
+  // Summarize the GLUE reports
+  //GLUE_PARSER(HCV_GLUE_MAJOR.out.GLUE_json.collect(), HCV_GLUE_MINOR.out.GLUE_json.collect())
 
   // Summarize the mapping statistics for all samples
   if (params.mapper == "tanoti") {
@@ -104,11 +110,10 @@ workflow {
     ch_depth = MAP_MAJORITY_BOWTIE2.out.DEPTH.collect().mix(MAP_MINORITY_BOWTIE2.out.DEPTH.collect())
   }
 
-  // Summarize the mapping statistics for all samples
   SUMMARIZE_MAPPING(ch_stats,
                     ch_depth,
-                    BLASTN.out.for_summarize.collect())
-
+                    BLASTN.out.for_summarize.collect(),
+                    HCV_GLUE_PARSER_MAJOR.out.GLUE_summary.collect().mix(HCV_GLUE_PARSER_MINOR.out.GLUE_summary.collect()))
 
   //
   // MultiQC
