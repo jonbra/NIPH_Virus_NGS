@@ -12,12 +12,8 @@ process HCV_GLUE {
 
     script:
     """
-    # Create variable to hold the bam file name
-    #bam=\$(ls *markdup.bam)
-
-    # Copy bam file from current directory to a bam/ directory so they are not present in work directory as links.
+     # Copy bam file to a new filename so they are not present in work directory as links.
     # This is for mounting to the docker image later
-    #mkdir bams
     cp ${bam} glue_${bam}
     
     # Pull the latest image
