@@ -26,7 +26,6 @@ include { MAP_MINORITY_BOWTIE2 }        from "./modules/map_minority_bowtie2.nf"
 include { IDENTIFY_MAJOR_MINOR }    from "./modules/identify_major_minor.nf"
 //include { CONSENSUS_MAJOR }     from "./modules/consensus_major.nf"
 //include { CONSENSUS_MINOR }     from "./modules/consensus_minor.nf"
-include { SUMMARIZE_MAPPING }     from "./modules/summarize_mapping.nf"
 include { GLUE_PARSER as HCV_GLUE_PARSER_MAJOR}          from "./modules/glue_parser.nf" 
 include { GLUE_PARSER as HCV_GLUE_PARSER_MINOR}          from "./modules/glue_parser.nf" 
 
