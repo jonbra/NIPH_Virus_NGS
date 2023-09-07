@@ -17,7 +17,8 @@ fastq <- list.files(folder,
            full.names = TRUE,
            pattern = "gz$")
 
-# fastq <- fastq[str_detect(fastq, agens)]
+# Filter on agens
+fastq <- fastq[str_detect(fastq, agens)]
 
 R1 <- sort(fastq[grep("R1", fastq)])
 R2 <- sort(fastq[grep("R2", fastq)])
