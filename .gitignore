@@ -12,7 +12,6 @@ HEV_*/*
 HCV-nf/*
 Data/Raw_files/*
 Data/Kraken_db/*
-Data/Blast_db/*
 Run712*/*
 Test*/
 Bowtie_test/*
