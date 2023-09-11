@@ -2,11 +2,17 @@
 
 library(tidyverse)
 
-# Number of mapped reads --------------------------------------------------
+args = commandArgs(trailingOnly=TRUE)
+if (length(args) < 5) {
+  stop("Usage: blast_parse.R <sampleName> <blast_out> <scaffolds> <references> <agens>", call.=FALSE)
+}
+
 path_1 <- "stats/"
 path_2 <- "depth/"
 path_3 <- "blast/"
-
+agens  <- args[1]
+  
+  # Number of mapped reads --------------------------------------------------
 df <- list.files(path = path_1, pattern = "stats", full.names = TRUE) %>% 
   # Keep the file names as the names of the list elements
   set_names() %>% 
@@ -84,6 +90,47 @@ tmp <- df %>%
   mutate(sampleName = basename(sampleName)) %>% 
   pivot_longer(!sampleName, names_to = "reference", values_to = "mapped_reads") %>% filter(!is.na(mapped_reads))
 tmp_df <- left_join(tmp_df, tmp)
+
+# Create heatmap
+
+if (agens == "ROV") {
+  tmp_df %>% 
+    # Clean up segment names
+    mutate("segment" = case_when(
+      genotype == "ASeg1VP1" ~ "Seg1_VP1",
+      genotype == "ASeg10NSP4" ~ "Seg10_NSP4",
+      genotype == "ASeg2VP2" ~ "Seg2_VP2",
+      genotype == "ASeg3VP3" ~ "Seg3_VP3",
+      genotype == "ASeg4VP4" ~ "Seg4_VP4_P",
+      genotype == "ASeg5NSP1" ~ "Seg5_NSP1",
+      genotype == "ASeg6VP6" ~ "Seg6_VP6",
+      genotype == "ASeg8NSP2" ~ "Seg8_NSP2",
+      genotype == "ASeg9VP7" ~ "Seg9_VP7_G",
+      genotype == "BatNSP3" ~ "Seg7_NSP3_Bat",
+      genotype == "ASeg11NSP5" ~ "Seg11_NSP5",
+      genotype == "ASeg7NSP3" ~ "Seg7_NSP3",
+      genotype == "BatVP2" ~ "Seg2_VP2_Bat",
+      genotype == "DChickSeg5" ~ "Seg5_NSP1_D"
+    )) %>% 
+    # Create a factor for ordering
+    mutate(segment_f = factor(
+      x = segment,
+      levels = c("Seg1_VP1", "Seg2_VP2", "Seg2_VP2_Bat", "Seg3_VP3", "Seg4_VP4_P", "Seg5_NSP1", "Seg5_NSP1_D", "Seg6_VP6", "Seg7_NSP3", "Seg7_NSP3_Bat", "Seg8_NSP2", "Seg9_VP7_G", "Seg10_NSP4", "Seg11_NSP5")
+    )) %>% 
+  ggplot() +
+    aes(x = segment_f, y = sampleName) + 
+    geom_tile(aes(fill = cov_breadth_min_5)) +
+    # Label with coverage and mapped reads
+    geom_text(aes(label = paste0(cov_breadth_min_5, "\n", mapped_reads)), color = "white") +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank(), 
+          axis.line = element_line(colour = "black"),
+          axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5))
+  
+  # Write plot
+  ggsave("ROV_heatmap_cov_breadth.png", device = "png")
+}
 
 
 # Length of scaffolds -----------------------------------------------------
