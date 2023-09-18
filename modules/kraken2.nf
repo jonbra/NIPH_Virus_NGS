@@ -6,7 +6,7 @@ process KRAKEN2 {
     publishDir "${params.outdir}/3_kraken2/", mode:'copy', pattern:'*.{txt,yml}'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
 
-    label 'medium'
+    label 'large'
 
     input:
     tuple val(sampleName), path(read1), path(read2)
