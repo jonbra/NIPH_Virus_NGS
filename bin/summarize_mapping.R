@@ -3,8 +3,8 @@
 library(tidyverse)
 
 args = commandArgs(trailingOnly=TRUE)
-if (length(args) < 5) {
-  stop("Usage: blast_parse.R <sampleName> <blast_out> <scaffolds> <references> <agens>", call.=FALSE)
+if (length(args) < 1) {
+  stop("Usage: summarize_mapping.R <agens>", call.=FALSE)
 }
 
 path_1 <- "stats/"
