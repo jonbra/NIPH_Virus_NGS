@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 include { FASTQC }                from "./modules/fastqc.nf"
 include { TRIM }                  from "./modules/trim.nf"
 include { FASTQC as FASTQC_TRIM } from "./modules/fastqc.nf"
-//include { KRAKEN2 }               from "./modules/kraken2.nf"
+include { KRAKEN2 }               from "./modules/kraken2.nf"
 include { KRAKEN2_FOCUSED }       from "./modules/kraken2_focused.nf"
 //include { REPAIR }                from "./modules/repair.nf"
 include { SPADES }                from "./modules/spades.nf"
@@ -57,7 +57,7 @@ workflow {
   
   TRIM(reads)
   FASTQC_TRIM(TRIM.out.TRIM_out, 'trimmed')
-  //KRAKEN2(TRIM.out.TRIM_out, params.kraken_all)
+  KRAKEN2(TRIM.out.TRIM_out, params.kraken_all)
   KRAKEN2_FOCUSED(TRIM.out.TRIM_out, params.kraken_focused)
 
   // Include the reference-based sub-workflow at this stage. Run that separately to the end
@@ -120,7 +120,7 @@ workflow {
     params.multiqc_config,
     FASTQC.out.FASTQC_out.collect{it[1]}.ifEmpty([]),
     TRIM.out.log.collect{it[1]}.ifEmpty([]),
-    //KRAKEN2.out.report.collect{it[1]}.ifEmpty([]),
+    KRAKEN2.out.report.collect{it[1]}.ifEmpty([]),
     KRAKEN2_FOCUSED.out.report.collect{it[1]}.ifEmpty([]),
     FASTQC_TRIM.out.FASTQC_out.collect{it[1]}.ifEmpty([]),
     MAP_TO_GENOTYPES.out.flagstat_dups.collect{it[1]}.ifEmpty([]),

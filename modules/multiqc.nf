@@ -8,7 +8,7 @@ process MULTIQC {
     path 'multiqc_config.yaml'
     path ('fastqc_raw/*')
     path ('cutadapt/*')
-    //path ('kraken2_all/*')
+    path ('kraken2_all/*')
     path ('kraken2_subset/*')
     path ('fastqc_trimmed/*')
     path ('bowtie2_dups/*')
