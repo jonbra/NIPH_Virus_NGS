@@ -3,8 +3,12 @@
 library(tidyverse)
 library(jsonlite)
 
-json_files <- list.files(pattern = "json$",
-                         full.names = TRUE)
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) < 1) {
+  stop("Usage: Rscript GLUE_json_parser.R <GLUE json report>", call.=FALSE)
+}
+
+json_file <- args[1]
 
 # Create final data file
 df_final <- tibble(
@@ -58,13 +62,12 @@ df_final <- tibble(
   "PHE drug resistance extension version"  = character()
 )
 
-for (x in 1:length(json_files)) {
-  try(json <- read_json(json_files[x]))
-  
+json <- read_json(json_file)
+
   # Only read the proper json GLUE reports (i.e. that there was a good sequence)
   if (names(json) == "phdrReport") {
     # Sample name
-    sample <- unlist(strsplit(basename(json_files[x]), "\\."))[[1]]
+    sample <- unlist(strsplit(basename(json_file), "\\."))[[1]]
     
     # Få tak i genotype
     genotype <- json[["phdrReport"]][["samReferenceResult"]][["genotypingResult"]][["genotypeCladeCategoryResult"]][["shortRenderedName"]]
@@ -207,7 +210,8 @@ for (x in 1:length(json_files)) {
   
   # Merge with final data structure
   df_final <- bind_rows(df_final, df)
-}
 
-write_tsv(df_final, file = "GLUE.tsv")
+  reference <- unlist(strsplit(basename(json_file), "\\."))[[2]]
+  major_minor <- unlist(strsplit(basename(json_file), "\\."))[[3]]
 
+  write_tsv(df_final, file = paste0(sample, ".", reference, ".", major_minor, "_GLUE_report.tsv"))
