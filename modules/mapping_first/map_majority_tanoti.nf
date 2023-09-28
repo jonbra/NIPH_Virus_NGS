@@ -11,7 +11,7 @@ process MAP_MAJORITY_TANOTI {
     tuple val(sampleName), path(major_ref)
 
     publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*major*.{bam,bai}'
-    publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*.{stats,log,sh,txt,yml}'
+    publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*.{stats,log,sh,txt,yml,gz}'
 
     output:
     tuple val(sampleName), path ("${sampleName}.*.major.markdup.bam"), path ("${sampleName}.*.major.markdup.bam.bai"), optional: true, emit: majority_out
