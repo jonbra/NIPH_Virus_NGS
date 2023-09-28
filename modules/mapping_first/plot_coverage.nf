@@ -1,6 +1,6 @@
 process PLOT_COVERAGE {
     
-    container 'jonbra/tidyverse_seqinr:1.0'
+    container 'jonbra/tidyverse_seqinr:2.0'
 
     errorStrategy 'terminate'
 
@@ -20,7 +20,7 @@ process PLOT_COVERAGE {
 
     script:
     """
-    bam_coverage.R "${depth}"
+    bam_coverage_hcv.R "${depth}"
 
     cp .command.log plot_coverage_command.log
     cp .command.sh plot_coverage_command.sh

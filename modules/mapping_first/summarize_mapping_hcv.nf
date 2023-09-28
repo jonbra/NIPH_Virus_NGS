@@ -1,6 +1,6 @@
-process SUMMARIZE_MAPPING {
+process SUMMARIZE_MAPPING_HCV {
     
-    container 'jonbra/tidyverse_seqinr:1.0'
+    container 'jonbra/tidyverse_seqinr:2.0'
 
     errorStrategy 'terminate'
 
@@ -23,7 +23,7 @@ process SUMMARIZE_MAPPING {
 
     script:
     """
-    summarize_mapping.R
+    summarize_mapping_hcv.R
 
     cp .command.log summarize_mapping_command.log
     cp .command.sh summarize_mapping_command.sh
