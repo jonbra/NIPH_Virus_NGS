@@ -1,6 +1,6 @@
 process PLOT_COVERAGE {
     
-    container 'jonbra/tidyverse_seqinr:1.0'
+    container 'jonbra/tidyverse_seqinr:2.0'
 
     errorStrategy 'terminate'
 
