@@ -49,7 +49,7 @@ workflow {
       
       // Make a copy of the samplelist and params-file in the result folder
       file(params.samplelist).copyTo("${params.outdir}/${params.samplelist}")
-      //file(params.params-file).copyTo("${params.outdir}/${params.params-file}")
+      file(params.parameter_file).copyTo("${params.outdir}/${params.parameter_file}")
   }
 
   INDEX(params.blast_db) 
