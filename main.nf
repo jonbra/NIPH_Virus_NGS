@@ -1,29 +1,18 @@
 nextflow.enable.dsl=2
 
 //
-// Import modules to use in the main workflow
+// Import modules for the main workflow
 //
+include { INDEX }                 from "./modules/index.nf"
 include { FASTQC }                from "./modules/fastqc.nf"
 include { TRIM }                  from "./modules/trim.nf"
 include { FASTQC as FASTQC_TRIM } from "./modules/fastqc.nf"
 include { KRAKEN2 }               from "./modules/kraken2.nf"
 include { KRAKEN2_FOCUSED }       from "./modules/kraken2_focused.nf"
 include { SPADES }                from "./modules/spades.nf"
-include { MULTIQC }               from "./modules/multiqc.nf"
 include { BLASTN }                from "./modules/blastn.nf"
 include { BLAST_PARSE }           from "./modules/blast_parse.nf"
-
-
-
-include { INDEX }                 from "./modules/index.nf"
-include { DEDUP }                 from "./modules/dedup.nf"
-include { BOWTIE2 }               from "./modules/bowtie2.nf"
-include { TANOTI }                from "./modules/tanoti.nf"
-include { HCV_GLUE_SQL }          from "./modules/hcv_glue.nf"
-include { GLUE_PARSER }           from "./modules/glue_parser.nf"
-include { CLIQUE_SNV }            from "./modules/cliquesnv.nf"
-include { HBV_RT_BLAST }          from "./modules/hbv_rt_blast.nf"
-include { HBV_RT_BLAST_PARSE }    from "./modules/hbv_rt_blast_parse.nf"
+include { MULTIQC }               from "./modules/multiqc.nf"
 include { VERSIONS }              from "./modules/versions.nf"
 
 // 
@@ -31,6 +20,7 @@ include { VERSIONS }              from "./modules/versions.nf"
 //
 include { HCV_WORKFLOW }    from "./subworkflows/hcv.nf"
 include { DENOVO_WORKFLOW } from "./subworkflows/denovo.nf"
+//include { HBV_WORKFLOW }    from "./subworkflows/hbv.nf"
 
 
 // 
@@ -123,7 +113,6 @@ workflow {
   //
   // Report versions
   //
-  ch_versions.view()
   VERSIONS(ch_versions.unique().collectFile(name: 'combined_versions.yml'))
 
 }
