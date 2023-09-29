@@ -20,6 +20,7 @@ process BLAST_PARSE {
     tuple val(sampleName), path('*.csv')                                                   , emit: blast_res
     path '*scaffolds.fa'                                                                   , emit: RESISTANCE_BLAST
     path "*.{log,sh}"
+    path "blast_parse_versions.yml", emit: versions
 
     script:
     """
@@ -28,5 +29,10 @@ process BLAST_PARSE {
 
     cp .command.log ${sampleName}.blast_parse_command.log
     cp .command.sh ${sampleName}.blast_parse_command.sh
+
+    cat <<-END_VERSIONS > blast_parse_versions.yml
+    "${task.process}":
+        R-session: \$(cat R_versions.txt)
+    END_VERSIONS
     """
 }
