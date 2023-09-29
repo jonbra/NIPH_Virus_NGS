@@ -42,7 +42,8 @@ workflow {
               .map{ row -> tuple(row.sample, file(row.fastq_1), file(row.fastq_2))}
       
       // Make a copy of the samplelist and params-file in the result folder
-      file(params.samplelist).copyTo("${params.outdir}/${params.samplelist}")
+      new_path = "${params.samplelist}".replaceAll('samplesheets/', '') // Remove the samplesheets/ prefix
+      file(params.samplelist).copyTo("${params.outdir}/${new_path}")
       file(params.parameter_file).copyTo("${params.outdir}/${params.parameter_file}")
   }
 
