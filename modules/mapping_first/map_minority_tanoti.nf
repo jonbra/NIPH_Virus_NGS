@@ -11,7 +11,7 @@ process MAP_MINORITY_TANOTI {
     tuple val(sampleName), path(minor_ref)
 
     publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*minor*.{bam,bai}'
-    publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*.{stats,log,sh,txt,yml}'
+    publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*.{stats,log,sh,txt}'
 
     output:
     tuple val(sampleName), path ("${sampleName}.*.minor.markdup.bam"), path ("${sampleName}.*.minor.markdup.bam.bai"), optional: true, emit: minority_out
@@ -20,6 +20,7 @@ process MAP_MINORITY_TANOTI {
     path "${sampleName}.*.minor.markdup.bam.stats"                                                                   , optional: true, emit: STATS
     path "*.log"                                                                                                     , optional: true, emit: BOWTIE2_log
     path "*.{stats,sh,txt}"                                                                                          , optional: true
+    path "tanoti.minority_mapping.versions.yml"                                                                      , optional: true, emit: versions
 
     script:
     """

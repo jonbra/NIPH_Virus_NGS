@@ -3,25 +3,25 @@ process SPADES {
     conda 'bioconda::spades=3.15.5'
     container 'quay.io/biocontainers/spades:3.15.4--h95f258a_0'
 
+    // Force Nextflow to run a single sample at the time due to resource demands
     maxForks 1
 
     // Sometimes there can be zero reads after SUBSET_KRAKEN2, in which case Spades will crash.
     errorStrategy 'ignore'
 
-    label 'spades'
+    label 'large'
 
     publishDir "${params.outdir}/4_spades/", mode:'copy', pattern:'*.fa'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
-    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     input:
     tuple val(sampleName), path(read1), path(read2)
 
     output:
     tuple val(sampleName), path("${sampleName}.scaffolds.fa"), path(read1), path(read2), emit: scaffolds, optional: true
-    path('*.log')    
-    path "spades_versions.yml"   
-    path "${sampleName}.spades_command.sh"   
+    path('*.log')     
+    path "${sampleName}.spades_command.sh"  
+    path "spades_versions.yml", emit: versions 
 
     script:
     """

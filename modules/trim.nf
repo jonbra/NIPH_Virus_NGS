@@ -6,7 +6,6 @@ process TRIM {
     publishDir "${params.outdir}/2_trimmed", mode:'copy', pattern:'*.{fastq}'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*process_command_cutadapt.log'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.sh'
-    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     label 'small'
 
@@ -17,7 +16,8 @@ process TRIM {
     tuple val(sampleName), path ("${sampleName}_trimmed_R1.fastq"), path ("${sampleName}_trimmed_R2.fastq"), emit: TRIM_out
     tuple val(sampleName), path ("${sampleName}.cutadapt.log")                                             , emit: log
     path "${sampleName}.process_command_cutadapt.log"
-    path "*.{sh,yml}"
+    path "*.sh"
+    path "cutadapt_versions.yml"                                                                           , emit: versions
 
     script:
     """

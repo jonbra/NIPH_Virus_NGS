@@ -13,7 +13,7 @@ process IDENTIFY_MAJOR_MINOR {
     output:
     tuple val(sampleName), path("${sampleName}.major_ref.txt"), optional: true, emit: major_ref
     tuple val(sampleName), path("${sampleName}.minor_ref.txt"), optional: true, emit: minor_ref
-    path "R_versions.txt"
+    path "R_versions.txt"                                                     , emit: versions
     path "*{log,sh}"
 
     script:

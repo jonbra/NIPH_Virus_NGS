@@ -5,7 +5,6 @@ process BLASTN {
 
     publishDir "${params.outdir}/5_blast/", mode:'copy', pattern:'*.{out}'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
-    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     input:
     tuple val(sampleName), path(scaffolds), path(read1), path(read2)
@@ -14,7 +13,8 @@ process BLASTN {
     output:
     tuple val(sampleName), path("${sampleName}_blast.out"), path(scaffolds), path(read1), path(read2), path(blast_db), emit: blastn_out
     path("${sampleName}_blast.out")                                                                                  , emit: for_summarize
-    path "*.{log,sh,yml}"
+    path "*.{log,sh}"
+    path "blastn_versions.yml", emit: versions
 
     script:
 

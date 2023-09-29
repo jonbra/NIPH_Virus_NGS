@@ -5,7 +5,6 @@ process FASTQC {
 
     publishDir "${params.outdir}/1_fastqc/", mode:'copy', pattern:'*.{zip}'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
-    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     label 'small'
 
@@ -15,7 +14,8 @@ process FASTQC {
 
     output:
     tuple val(sampleName), path ("*.zip"), emit: FASTQC_out
-    path "*.{log,sh,yml}"
+    path "*.{log,sh}"
+    path "fastqc_versions.yml"           , emit: versions
 
     script:
     """
@@ -25,7 +25,7 @@ process FASTQC {
     cp .command.sh ${sampleName}.${source}.fastqc.sh
 
     cat <<-END_VERSIONS > fastqc_versions.yml
-        "${task.process}":
+    "${task.process}":
         fastqc: \$( fastqc --version | sed -e "s/FastQC v//g" )
     END_VERSIONS
     """

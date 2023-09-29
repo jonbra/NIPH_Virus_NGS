@@ -8,7 +8,6 @@ process SUMMARIZE_MAPPING_HCV {
 
     publishDir "${params.outdir}/8_summaries/", mode:'copy', pattern:'*.{csv}'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
-    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.txt'
 
     input:
     path 'stats/'
@@ -18,7 +17,6 @@ process SUMMARIZE_MAPPING_HCV {
 
     output:
     path '*csv', emit: mapping_summary
-    path 'R_versions.txt'
     path '*{log,sh}'
 
     script:

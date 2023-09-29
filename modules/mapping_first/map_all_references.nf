@@ -9,7 +9,7 @@ process MAP_ALL_REFERENCES {
     path genome
 
     publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*first_mapping*.{stats,idxstats}'
-    publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*.{log,sh,txt,yml}'
+    publishDir "${params.outdir}/6_map", mode: 'copy', pattern:'*.{log,sh,txt}'
 
     output:
     tuple val(sampleName), path ("${sampleName}.first_mapping.sorted.bam"), path ("${sampleName}.first_mapping.sorted.bam.bai"), optional: true, emit: sorted_out
@@ -18,6 +18,7 @@ process MAP_ALL_REFERENCES {
     tuple val(sampleName), path("${sampleName}.first_mapping.sorted.bam.stats")                                                , optional: true, emit: stats
     tuple val(sampleName), path("${sampleName}.first_mapping.sorted.bam_coverage.txt.gz")                                      , optional: true, emit: DEPTH
     path "*.{sh,txt}"                                                                                                          , optional: true
+    path "first_mapping.versions.yml"                                                                                          , optional: true, emit: versions
 
     script:
     """

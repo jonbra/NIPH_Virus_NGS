@@ -2,7 +2,7 @@ process MAP_MINORITY_BOWTIE2 {
 
     container 'jonbra/viral_haplo:1.3'
 
-    label 'small'
+    label 'medium'
 
     input:
     tuple val(sampleName), path(read1), path(read2)
@@ -11,14 +11,15 @@ process MAP_MINORITY_BOWTIE2 {
     tuple val(sampleName), path ("${sampleName}.first_mapping.sorted.bam"), path ("${sampleName}.first_mapping.sorted.bam.bai")
 
     publishDir "${params.outdir}/ref-based", mode: 'copy', pattern:'*major*.{bam,bai}'
-    publishDir "${params.outdir}/ref-based", mode: 'copy', pattern:'*.{stats,log,sh,txt,yml}'
+    publishDir "${params.outdir}/ref-based", mode: 'copy', pattern:'*.{stats,log,sh,txt}'
 
     output:
     //tuple val(sampleName), path ("${sampleName}.markdup.bam"), path ("${sampleName}.markdup.bam.bai"), optional: true, emit: markdup_out
     tuple val(sampleName), path ("${sampleName}.minor.markdup.bam"), path ("${sampleName}.minor.markdup.bam.bai"), optional: true, emit: minority_out
     path "${sampleName}.minor.markdup.bam"                                                                       , optional: true, emit: GLUE
-    path "*.log", optional: true, emit: BOWTIE2_log
-    path "*.{stats,sh,txt}", optional: true
+    path "*.log"                                                                                                 , optional: true, emit: BOWTIE2_log
+    path "*.{stats,sh,txt}"                                                                                      , optional: true
+    path "bowtie2.minority_mapping.versions.yml"                                                                                 , emit: versions 
 
     script:
     """

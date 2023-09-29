@@ -5,7 +5,6 @@ process KRAKEN2_FOCUSED {
 
     publishDir "${params.outdir}/3_kraken2/", mode:'copy', pattern:'*.{txt}'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
-    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     label 'small'
 
@@ -16,7 +15,8 @@ process KRAKEN2_FOCUSED {
     output:
     tuple val(sampleName), path("${sampleName}.classified_1.fastq"), path("${sampleName}.classified_2.fastq"), emit: classified_reads_fastq
     tuple val(sampleName), path("${sampleName}.kraken2_focused.report.txt")                                  , emit: report
-    path "*.{log,sh,yml}"
+    path "*.{log,sh}"
+    path "kraken2_versions.yml", emit: versions
 
     script:
     """

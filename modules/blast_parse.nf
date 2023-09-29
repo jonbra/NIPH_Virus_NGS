@@ -9,7 +9,6 @@ process BLAST_PARSE {
 
     publishDir "${params.outdir}/5_blast/", mode:'copy', pattern:'*.{csv,tsv,fa}'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
-    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.txt'
 
     input:
     tuple val(sampleName), path(blast_out), path(scaffolds), path(read1), path(read2), path(references)
@@ -20,7 +19,6 @@ process BLAST_PARSE {
     tuple val(sampleName), path("${sampleName}*ref.fa"), path("${sampleName}*scaffolds.fa"), emit: FOR_ABACAS
     tuple val(sampleName), path('*.csv')                                                   , emit: blast_res
     path '*scaffolds.fa'                                                                   , emit: RESISTANCE_BLAST
-    path 'R_versions.txt'
     path "*.{log,sh}"
 
     script:
