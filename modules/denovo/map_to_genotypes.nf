@@ -6,7 +6,6 @@ process MAP_TO_GENOTYPES {
 
     publishDir "${params.outdir}/6_map/", mode:'copy', pattern:'*.{bam,bai,stats,gz}'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
-    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     input:
     // Her kan det være flere ref.fa-filer. Det kan variere
@@ -19,7 +18,7 @@ process MAP_TO_GENOTYPES {
     path '*.nodups.bam'                                                                          , emit: GLUE
     path '*.stats'                                                                               , emit: STATS
     path '*.gz'                                                                                  , emit: DEPTH
-    path '*.yml'
+    path 'bowtie2_versions.yml', emit: versions
     path '*.log'
     path '*.sh'
 

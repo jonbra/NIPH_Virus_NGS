@@ -8,14 +8,12 @@ process PLOT_COVERAGE {
 
     publishDir "${params.outdir}/7_coverage/", mode:'copy', pattern:'*.{png}'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
-    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.txt'
 
     input:
     path 'plots/'
 
     output:
     path '*png', emit: coverage_plots
-    path 'R_versions.txt'
     path '*{log,sh}'
 
     script:
