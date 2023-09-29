@@ -11,19 +11,18 @@ process MULTIQC {
     path ('kraken2_all/*')
     path ('kraken2_subset/*')
     path ('fastqc_trimmed/*')
-    path ('bowtie2_dups/*')
-    path ('bowtie2_nodups/*')
+    //path ('bowtie2_dups/*')
+    //path ('bowtie2_nodups/*')
     //path ('assembly_spades/*')
 
     output:
     path "*multiqc_report.html"     , emit: report
     path "*_data"                   , emit: data
     path 'multiqc_command.{log,sh}'
-    path 'multiqc_versions.yml'
+    path 'multiqc_versions.yml', emit: versions
 
     publishDir "${params.outdir}/9_multiqc/", mode: 'copy', pattern:'*multiqc_*'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
-    publishDir "${params.outdir}/versions/", mode:'copy', pattern:'*.yml'
 
     script:
     """
