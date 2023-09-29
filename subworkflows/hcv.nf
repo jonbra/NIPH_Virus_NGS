@@ -42,7 +42,6 @@ workflow HCV_WORKFLOW {
       MAP_MAJORITY_TANOTI(classified_reads, blast_db, MAP_ALL_REFERENCES.out.sorted_out, IDENTIFY_MAJOR_MINOR.out.major_ref)
       ch_versions = ch_versions.mix(MAP_MAJORITY_TANOTI.out.versions)
       MAP_MINORITY_TANOTI(classified_reads, blast_db, MAP_ALL_REFERENCES.out.sorted_out, IDENTIFY_MAJOR_MINOR.out.minor_ref)
-      ch_versions = ch_versions.mix(MAP_MINORITY_TANOTI.out.versions.ifEmpty(null))
       ch_glue_major = MAP_MAJORITY_TANOTI.out.GLUE
       ch_glue_minor = MAP_MINORITY_TANOTI.out.GLUE
       ch_depth_major = MAP_MAJORITY_TANOTI.out.DEPTH
@@ -52,7 +51,6 @@ workflow HCV_WORKFLOW {
       MAP_MAJORITY_BOWTIE2(classified_reads, blast_db, MAP_ALL_REFERENCES.out.sorted_out, IDENTIFY_MAJOR_MINOR.out.major_ref)
       ch_versions = ch_versions.mix(MAP_MAJORITY_BOWTIE2.out.versions)
       MAP_MINORITY_BOWTIE2(classified_reads, blast_db, MAP_ALL_REFERENCES.out.sorted_out, IDENTIFY_MAJOR_MINOR.out.minor_ref)
-      ch_versions = ch_versions.mix(MAP_MINORITY_BOWTIE2.out.versions.ifEmpty(null))
       ch_glue_major = MAP_MAJORITY_BOWTIE2.out.GLUE
       ch_glue_minor = MAP_MINORITY_BOWTIE2.out.GLUE
       ch_depth_major = MAP_MAJORITY_BOWTIE2.out.DEPTH
@@ -62,11 +60,13 @@ workflow HCV_WORKFLOW {
   // Run GLUE analysis
   HCV_GLUE_MAJOR(ch_glue_major)
   HCV_GLUE_PARSER_MAJOR(HCV_GLUE_MAJOR.out.GLUE_json)
+  ch_versions = ch_versions.mix(HCV_GLUE_PARSER_MAJOR.out.versions)
   HCV_GLUE_MINOR(ch_glue_minor)
   HCV_GLUE_PARSER_MINOR(HCV_GLUE_MINOR.out.GLUE_json)
   
   // Plot the coverage of all the genotype mappings
   PLOT_COVERAGE_MAJOR(ch_depth_major)
+  ch_versions = ch_versions.mix(PLOT_COVERAGE_MAJOR.out.versions)
   PLOT_COVERAGE_MINOR(ch_depth_minor)
 
   // Summarize the GLUE reports
@@ -85,6 +85,7 @@ workflow HCV_WORKFLOW {
                         ch_depth,
                         blast_out,
                         HCV_GLUE_PARSER_MAJOR.out.GLUE_summary.collect().mix(HCV_GLUE_PARSER_MINOR.out.GLUE_summary.collect()))
+  ch_versions = ch_versions.mix(SUMMARIZE_MAPPING_HCV.out.versions)
 
   emit:
     versions = ch_versions
