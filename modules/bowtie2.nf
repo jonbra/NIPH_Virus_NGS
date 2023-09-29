@@ -5,7 +5,7 @@ process BOWTIE2 {
     tag "$sampleName"
     //errorStrategy 'ignore'
 
-    label 'small'
+    label 'medium'
 
     input:
     tuple val(sampleName), path(read1), path(read2)
