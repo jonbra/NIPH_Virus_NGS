@@ -20,6 +20,7 @@ process SUMMARIZE_MAPPING {
     path '*csv', emit: mapping_summary
     path '*.png', optional: true
     path '*{log,sh}'
+    path "summarize_mapping_versions.yml", emit: versions
 
     script:
     """
@@ -27,6 +28,11 @@ process SUMMARIZE_MAPPING {
 
     cp .command.log summarize_mapping_command.log
     cp .command.sh summarize_mapping_command.sh
+
+    cat <<-END_VERSIONS > summarize_mapping_versions.yml
+    "${task.process}":
+        R-session: \$(cat R_versions.txt)
+    END_VERSIONS
     """
 
 }

@@ -15,13 +15,19 @@ process PLOT_COVERAGE {
     output:
     path '*png', emit: coverage_plots
     path '*{log,sh}'
-
+    path "plot_coverage_versions.yml", emit: versions
+    
     script:
     """
     bam_coverage_hcv.R "${depth}"
 
     cp .command.log plot_coverage_command.log
     cp .command.sh plot_coverage_command.sh
+
+    cat <<-END_VERSIONS > plot_coverage_versions.yml
+    "${task.process}":
+        R-session: \$(cat R_versions.txt)
+    END_VERSIONS
     """
 
 }

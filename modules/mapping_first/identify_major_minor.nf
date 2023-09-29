@@ -13,15 +13,20 @@ process IDENTIFY_MAJOR_MINOR {
     output:
     tuple val(sampleName), path("${sampleName}.major_ref.txt"), optional: true, emit: major_ref
     tuple val(sampleName), path("${sampleName}.minor_ref.txt"), optional: true, emit: minor_ref
-    path "R_versions.txt"                                                     , emit: versions
+    path "identify_major_minor_versions.yml"                                  , emit: versions
     path "*{log,sh}"
 
     script:
     """
     summarize_mapping_to_all_references.R ${idxstats} ${depth} ${sampleName}
 
-    cp .command.log summarize_mapping_command.log
-    cp .command.sh summarize_mapping_command.sh
+    cp .command.log identify_major_minor_command.log
+    cp .command.sh identify_major_minor_command.sh
+
+    cat <<-END_VERSIONS > identify_major_minor_versions.yml
+    "${task.process}":
+        R-session: \$(cat R_versions.txt)
+    END_VERSIONS
     """
 
 }

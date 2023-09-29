@@ -15,6 +15,7 @@ process PLOT_COVERAGE {
     output:
     path '*png', emit: coverage_plots
     path '*{log,sh}'
+    path "bam_coverage_versions.yml", emit: versions
 
     script:
     """
@@ -22,6 +23,11 @@ process PLOT_COVERAGE {
 
     cp .command.log plot_coverage_command.log
     cp .command.sh plot_coverage_command.sh
+
+    cat <<-END_VERSIONS > bam_coverage_versions.yml
+    "${task.process}":
+        R-session: \$(cat R_versions.txt)
+    END_VERSIONS
     """
 
 }

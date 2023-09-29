@@ -15,6 +15,7 @@ process GLUE_PARSER {
     output:
     path '*tsv', optional:true, emit: GLUE_summary
     path '*{log,sh}'
+    path "glue_parser_versions.yml", emit: versions
 
     script:
     """
@@ -22,6 +23,11 @@ process GLUE_PARSER {
 
     cp .command.log glue_parser_command.log
     cp .command.sh glue_parser_command.sh
+
+    cat <<-END_VERSIONS > glue_parser_versions.yml
+    "${task.process}":
+        R-session: \$(cat R_versions.txt)
+    END_VERSIONS
     """
 
 
