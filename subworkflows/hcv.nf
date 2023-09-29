@@ -27,16 +27,22 @@ workflow HCV_WORKFLOW {
 
   main:
   
+  ch_versions = Channel.empty()
+
   // Map reads to all references using Bowtie2
   MAP_ALL_REFERENCES(classified_reads, blast_db) 
+  ch_versions = ch_versions.mix(MAP_ALL_REFERENCES.out.versions)
 
   // Summarize the mapping and identify major and minor subtypes
   IDENTIFY_MAJOR_MINOR(MAP_ALL_REFERENCES.out.idxstats, MAP_ALL_REFERENCES.out.DEPTH)
+  ch_versions = ch_versions.mix(IDENTIFY_MAJOR_MINOR.out.versions)
 
   // Map reads to the most abundant subtype, and a possible minor subtype
   if (params.mapper == "tanoti") {
       MAP_MAJORITY_TANOTI(classified_reads, blast_db, MAP_ALL_REFERENCES.out.sorted_out, IDENTIFY_MAJOR_MINOR.out.major_ref)
+      ch_versions = ch_versions.mix(MAP_MAJORITY_TANOTI.out.versions)
       MAP_MINORITY_TANOTI(classified_reads, blast_db, MAP_ALL_REFERENCES.out.sorted_out, IDENTIFY_MAJOR_MINOR.out.minor_ref)
+      ch_versions = ch_versions.mix(MAP_MINORITY_TANOTI.out.versions.ifEmpty(null))
       ch_glue_major = MAP_MAJORITY_TANOTI.out.GLUE
       ch_glue_minor = MAP_MINORITY_TANOTI.out.GLUE
       ch_depth_major = MAP_MAJORITY_TANOTI.out.DEPTH
@@ -44,7 +50,9 @@ workflow HCV_WORKFLOW {
   }
   else if (params.mapper == "bowtie2") {
       MAP_MAJORITY_BOWTIE2(classified_reads, blast_db, MAP_ALL_REFERENCES.out.sorted_out, IDENTIFY_MAJOR_MINOR.out.major_ref)
+      ch_versions = ch_versions.mix(MAP_MAJORITY_BOWTIE2.out.versions)
       MAP_MINORITY_BOWTIE2(classified_reads, blast_db, MAP_ALL_REFERENCES.out.sorted_out, IDENTIFY_MAJOR_MINOR.out.minor_ref)
+      ch_versions = ch_versions.mix(MAP_MINORITY_BOWTIE2.out.versions.ifEmpty(null))
       ch_glue_major = MAP_MAJORITY_BOWTIE2.out.GLUE
       ch_glue_minor = MAP_MINORITY_BOWTIE2.out.GLUE
       ch_depth_major = MAP_MAJORITY_BOWTIE2.out.DEPTH
@@ -77,4 +85,7 @@ workflow HCV_WORKFLOW {
                         ch_depth,
                         blast_out,
                         HCV_GLUE_PARSER_MAJOR.out.GLUE_summary.collect().mix(HCV_GLUE_PARSER_MINOR.out.GLUE_summary.collect()))
+
+  emit:
+    versions = ch_versions
 }
