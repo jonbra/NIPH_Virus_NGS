@@ -3,6 +3,8 @@ process BLASTN {
     conda 'bioconda::blast=2.12.0'
     container 'quay.io/biocontainers/blast:2.12.0--pl5262h3289130_0'
 
+    label 'small'
+
     publishDir "${params.outdir}/5_blast/", mode:'copy', pattern:'*.{out}'
     publishDir "${params.outdir}/logs/", mode:'copy', pattern:'*.{log,sh}'
 
@@ -24,6 +26,7 @@ process BLASTN {
         -dbtype nucl
 
     blastn \\
+        -num_threads ${task.cpus} \\
         -db $blast_db \\
         -query $scaffolds \\
         -outfmt 6 \\
