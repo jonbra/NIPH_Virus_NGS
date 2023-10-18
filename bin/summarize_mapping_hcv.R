@@ -140,7 +140,7 @@ tmp_df <- left_join(tmp_df, df)
 glue_reports <- list.files(path = path_4, pattern = "GLUE_report.tsv$", full.names = TRUE) %>% 
   # Keep the file names as the names of the list elements
   set_names() %>% 
-  map(read_tsv) %>% 
+  map(read_tsv, col_types = cols(GLUE_subtype = col_character())) %>% 
   # Reduce the list to a single dataframe. Keep the filenames (list element names) in column 1
   # The column name will be "sampleName"
   bind_rows(.id = "sampleName") %>% 
